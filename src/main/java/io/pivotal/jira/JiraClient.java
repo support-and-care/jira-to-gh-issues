@@ -151,7 +151,7 @@ public class JiraClient {
 							.retry(3);
 					Mono<Map<String, Object>> commitsResult = webClient.get()
 							.uri(builder -> builder
-									.replacePath("/rest/dev-status/1.0/issue/detail")
+									.replacePath("jira/rest/dev-status/1.0/issue/detail")
 									.query("issueId={id}&applicationType=github&dataType=repository")
 									.build(issue.getId()))
 							.retrieve()
