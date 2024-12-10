@@ -184,8 +184,9 @@ public class  MigrationClient {
 		repository.put("name", slug.split("/")[1]);
 		repository.put("private", "true");
 
+		String orga = slug.split("/")[0];
 		RequestEntity<Map<String, String>> requestEntity =
-				RequestEntity.post(URI.create(GITHUB_URL + "/user/repos"))
+				RequestEntity.post(URI.create(GITHUB_URL + "/orgs/" + orga + "/repos"))
 						.header(HttpHeaders.AUTHORIZATION, "token " + this.config.getAccessToken())
 						.body(repository);
 
