@@ -1,6 +1,24 @@
-A project for migrating issues from JIRA to GitHub.
+A project for migrating issues from Apache Maven JIRA to GitHub.
+It is based on the migration tool, that is written by the Spring Team, originally.
+
+The code adjudgements, that was needed for the Apache Maven Project:
+
+- create repository in organization is another REST API than create
+repository in a user space
+- Apache Jira has a path prefix in the URL
+(https://issues.apache.org/jira). Currently, this fact has to be hardcoded.
+
+Configuration changes:
+
+- change application.properties to Maven Clean Plugin JIRA Project metadata
+- add Application context Configuration for Maven Clean Plugin (needed
+for label mapping etc)
+
+
+
+
 A sample of the migration from Spring Security's JIRA to GitHub issues can be found at https://github.com/rwinch/spring-security-migrate-issues/issues[rwinch/spring-security-migrate-issues]
-See `src/main/resources/application.properties` for settings.
+See `src/main/resources/application.properties` for settings. (based on the original code)
 
 Some Key Features:
 
