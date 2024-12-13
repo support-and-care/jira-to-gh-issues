@@ -365,7 +365,7 @@ public class  MigrationClient {
 		Fields fields = issue.getFields();
 		DateTime updated = fields.getUpdated();
 		GithubIssue ghIssue = new GithubIssue();
-		ghIssue.setTitle(fields.getSummary() + " [" + issue.getKey() + "]");
+		ghIssue.setTitle("[" + issue.getKey() + "] " + fields.getSummary() );
 
 		MarkupEngine engine = markup.engine(issue.getFields().getCreated());
 		JiraUser reporter = fields.getReporter();
