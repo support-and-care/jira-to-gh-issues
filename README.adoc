@@ -15,6 +15,70 @@ Configuration changes:
 for label mapping etc)
 
 
+## How to Guide
+
+### Common Configuration
+
+1. Adjust `application.properties` with the metadata of the Jira projet that should migrate
+2. Configure the author mapping in `src/main/resources/jira-to-github-users.properties`
+3. Create a Application context Configuration
+[source, java]
+----
+@Configuration
+@ConditionalOnProperty(name = "jira.projectId", havingValue = "yourProjectId")
+public class MigrationConfig {
+
+
+}
+----
+
+### Label Mapping
+
+Add to your `MigrationConfig` class following beans:
+
+[source, java]
+----
+	@Bean
+	public LabelHandler labelHandler() {
+		FieldValueLabelHandler fieldValueHandler = new FieldValueLabelHandler();
+		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "Bug", "bug");
+
+		CompositeLabelHandler handler = new CompositeLabelHandler();
+		handler.addLabelHandler(fieldValueHandler);
+
+
+		return handler;
+	}
+----
+
+`labelHandler` can be used for simple mapping logic.
+If you need a mechanism where you can add more context information, you can implement an `IssuePorcessor`
+
+[source, java]
+----
+	@Bean
+	public IssueProcessor issueProcessor() {
+		return new CompositeIssueProcessor(new FixDependencyIssueProcessor());
+	}
+
+
+	private static class FixDependencyIssueProcessor implements IssueProcessor {
+
+		@Override
+		public void beforeImport(JiraIssue jiraIssue, ImportGithubIssue githubIssue) {
+			if (jiraIssue.getFields().getIssuetype().getName().equals("Task") ||
+			jiraIssue.getFields().getIssuetype().getName().equals("Improvement")) {
+				if(jiraIssue.getFields().getSummary().contains("Bump") || jiraIssue.getFields().getSummary().contains("Upgrade")) {
+					githubIssue.getIssue().setLabels(List.of("type:dependencies"));
+				}
+
+			}
+
+----
+
+
+## Original Content of the readme
+
 
 
 A sample of the migration from Spring Security's JIRA to GitHub issues can be found at https://github.com/rwinch/spring-security-migrate-issues/issues[rwinch/spring-security-migrate-issues]
