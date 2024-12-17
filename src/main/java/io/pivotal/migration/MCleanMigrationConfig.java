@@ -72,7 +72,7 @@ public class MCleanMigrationConfig {
 			if (jiraIssue.getFields().getIssuetype().getName().equals("Task") ||
 			jiraIssue.getFields().getIssuetype().getName().equals("Improvement")) {
 				if(jiraIssue.getFields().getSummary().contains("Bump") || jiraIssue.getFields().getSummary().contains("Upgrade")) {
-					githubIssue.getIssue().setLabels(List.of("type:dependencies"));
+					githubIssue.getIssue().setLabels(List.of("dependencies"));
 				}
 
 			}

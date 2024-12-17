@@ -69,12 +69,14 @@ If you need a mechanism where you can add more context information, you can impl
 			if (jiraIssue.getFields().getIssuetype().getName().equals("Task") ||
 			jiraIssue.getFields().getIssuetype().getName().equals("Improvement")) {
 				if(jiraIssue.getFields().getSummary().contains("Bump") || jiraIssue.getFields().getSummary().contains("Upgrade")) {
-					githubIssue.getIssue().setLabels(List.of("type:dependencies"));
+					githubIssue.getIssue().setLabels(List.of("dependencies"));
 				}
 
 			}
 
 ----
+If you want to configure the desing of the Github Labels, you have to adjust the `LabelFactories` class.
+
 
 
 ## Original Content of the readme

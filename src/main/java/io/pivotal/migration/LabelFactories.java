@@ -25,7 +25,7 @@ import java.util.function.Function;
  */
 public class LabelFactories {
 
-	public static final Function<String, Map<String, String>> TYPE_LABEL = name -> create("type: ", name, "e3d9fc");
+	public static final Function<String, Map<String, String>> TYPE_LABEL = name -> create("", name, "e3d9fc");
 
 	public static final Function<String, Map<String, String>> STATUS_LABEL = name -> create("status: ", name, "fef2c0");
 
