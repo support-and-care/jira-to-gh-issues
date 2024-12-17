@@ -49,7 +49,7 @@ public class MCleanMigrationConfig {
 		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "Bug", "bug");
 		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "Improvement", "enhancement");
 		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "New Feature", "enhancement");
-		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "Task", "dependencies");
+		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "Task", "maintenance");
 		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "Dependency Upgrade", "dependencies");
 
 		CompositeLabelHandler handler = new CompositeLabelHandler();
