@@ -17,8 +17,8 @@ package io.pivotal.migration;
 
 import io.pivotal.github.GithubIssue;
 import io.pivotal.github.ImportGithubIssue;
-import io.pivotal.jira.JiraFixVersion;
 import io.pivotal.jira.JiraIssue;
+import io.pivotal.jira.JiraIssueType;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -61,41 +61,20 @@ public class MCleanMigrationConfig {
 
 	@Bean
 	public IssueProcessor issueProcessor() {
-		return new CompositeIssueProcessor(new AssigneeDroppingIssueProcessor(), new Spr7640IssueProcessor());
+		return new CompositeIssueProcessor(new FixDependencyIssueProcessor());
 	}
 
 
-	private static class AssigneeDroppingIssueProcessor implements IssueProcessor {
-
-		private static final String label1 = LabelFactories.STATUS_LABEL.apply("waiting-for-triage").get("name");
-
-		private static final String label2 = LabelFactories.STATUS_LABEL.apply("ideal-for-contribution").get("name");
-
+	private static class FixDependencyIssueProcessor implements IssueProcessor {
 
 		@Override
-		public void beforeImport(JiraIssue issue, ImportGithubIssue importIssue) {
-			JiraFixVersion version = issue.getFixVersion();
-			GithubIssue ghIssue = importIssue.getIssue();
-			if (version != null && version.getName().contains("Backlog") ||
-					ghIssue.getLabels().contains(label1) ||
-					ghIssue.getLabels().contains(label2)) {
+		public void beforeImport(JiraIssue jiraIssue, ImportGithubIssue githubIssue) {
+			if (jiraIssue.getFields().getIssuetype().getName().equals("Task") ||
+			jiraIssue.getFields().getIssuetype().getName().equals("Improvement")) {
+				if(jiraIssue.getFields().getSummary().contains("Bump") || jiraIssue.getFields().getSummary().contains("Upgrade")) {
+					githubIssue.getIssue().setLabels(List.of("type:dependencies"));
+				}
 
-				ghIssue.setAssignee(null);
-			}
-		}
-	}
-
-
-	/**
-	 * The description of SPR-7640 is large enough to cause import failure.
-	 */
-	private static class Spr7640IssueProcessor implements IssueProcessor {
-
-		@Override
-		public void beforeConversion(JiraIssue issue) {
-			if (issue.getKey().equals("SPR-7640")) {
-				JiraIssue.Fields fields = issue.getFields();
-				fields.setDescription(fields.getDescription().substring(0, 1000) + "...");
 			}
 		}
 	}
