@@ -102,7 +102,7 @@ public class MigrationApp implements CommandLineRunner {
 			if (issueMappings.isEmpty()) {
 				JiraProject project = jira.findProject(jiraConfig.getProjectId());
 				github.createMilestones(project.getVersions());
-				github.createLabels();
+				github.createLabelsIfNotExist();
 			}
 			else {
 				// If there are issue mappings, we'll assume it's "restart after failure" and

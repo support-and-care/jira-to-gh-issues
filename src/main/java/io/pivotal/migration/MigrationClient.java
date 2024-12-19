@@ -211,11 +211,28 @@ public class  MigrationClient {
 		tracker.stopProgress();
 	}
 
-	public void createLabels() {
-
-		BodyBuilder bodyBuilder = getRepositoryRequestBuilder(HttpMethod.POST, "/labels");
+	public void createLabelsIfNotExist() {
+		List<String> existingLabelNames = findExistingLabels();
 
 		Set<Map<String, String>> labels = labelHandler.getAllLabels();
+		Set<Map<String, String>> newLabels = labels.stream().
+				filter(label -> !existingLabelNames.contains(label.get("name"))).
+				collect(Collectors.toSet());
+
+		createLabels(newLabels);
+	}
+
+	private List<String> findExistingLabels() {
+		RequestEntity<Void> requestEntity = getRepositoryRequestBuilder(HttpMethod.GET, "/labels").build();
+		List<Map<String, Object>> exitingsLabels = getRest().exchange(requestEntity, LIST_OF_MAPS_TYPE).getBody();
+		List<String> existingLabelNames = exitingsLabels.stream().map(labelObject -> (String) labelObject.get("name")).toList();
+		logger.info("Existing labels: {}", exitingsLabels);
+		return existingLabelNames;
+	}
+
+	private void createLabels(Set<Map<String, String>> labels) {
+		BodyBuilder bodyBuilder = getRepositoryRequestBuilder(HttpMethod.POST, "/labels");
+
 		logger.info("Creating labels: {}", labels);
 		ProgressTracker tracker = new ProgressTracker(labels.size(), logger.isDebugEnabled());
 		for (Map<String, String> map : labels) {
