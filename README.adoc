@@ -17,6 +17,10 @@ for label mapping etc)
 
 ## How to Guide
 
+### Create a service account in Github
+
+see xref:docs/how-to-create-gh-service-account.adoc[Guide: Service Accounts in GitHub]
+
 ### Common Configuration
 
 1. Adjust `application.properties` with the metadata of the Jira projet that should migrate
