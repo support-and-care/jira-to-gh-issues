@@ -24,7 +24,7 @@ see xref:docs/how-to-create-gh-service-account.adoc[Guide: Service Accounts in G
 ### Common Configuration
 
 1. Adjust `application.properties` with the metadata of the Jira projet that should migrate
-2. Configure the author mapping in `src/main/resources/jira-to-github-users.properties`
+2. Configure the author mapping in `src/main/resources/jira-to-github-users.properties` (for jire author exporting see xref:docs/how-to-export-jira-author.adoc[Guide: How to export Jira Author])
 3. Create a Application context Configuration
 [source, java]
 ----

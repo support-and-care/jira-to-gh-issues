@@ -1,0 +1,6 @@
+# Guide: Export Jira Author
+
+1. csv export of the jira project
+2. Delete all column except 'Reporter'
+3. `cat export.csv | cut -d ',' -f 1 | sort | uniq`
+4.  Ignore value `Reporter`
