@@ -15,6 +15,7 @@
  */
 package io.pivotal.migration;
 
+import io.pivotal.github.GithubComment;
 import io.pivotal.github.GithubIssue;
 import io.pivotal.github.ImportGithubIssue;
 import io.pivotal.jira.JiraIssue;
@@ -61,7 +62,7 @@ public class MCleanMigrationConfig {
 
 	@Bean
 	public IssueProcessor issueProcessor() {
-		return new CompositeIssueProcessor(new FixDependencyIssueProcessor());
+		return new CompositeIssueProcessor(new FixDependencyIssueProcessor(), new SkipBotCommentIssueProcessor());
 	}
 
 
@@ -76,6 +77,16 @@ public class MCleanMigrationConfig {
 				}
 
 			}
+		}
+	}
+
+	private static class SkipBotCommentIssueProcessor implements IssueProcessor {
+		@Override
+		public void beforeImport(JiraIssue jiraIssue, ImportGithubIssue importIssue) {
+			List<GithubComment> filteredCommentList = importIssue.getComments().stream()
+					.filter(githubComment -> !(githubComment.getBody().contains("https://issues.apache.org/secure/ViewProfile.jspa?name=hudson") || githubComment.getBody().contains("https://issues.apache.org/secure/ViewProfile.jspa?name=githubbot")))
+					.toList();
+			importIssue.setComments(filteredCommentList);
 		}
 	}
 
