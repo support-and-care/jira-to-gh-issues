@@ -1,18 +1,27 @@
-A project for migrating issues from Apache Maven JIRA to GitHub.
-It is based on the migration tool, that is written by the Spring Team, originally.
+# Migration tool for migrating issues from Apache Maven Jira to GitHub
+
+This tool is based on the migration tool, that is written by the Spring Team, originally.
+
+Some Key Features:
+
+* Performs basic conversion from JIRA markup to GitHub markup
+* Uses GitHub's experimental https://gist.github.com/jonmagic/5282384165e0f86ef105[import issue API] for increased speed and to keep dates accurate
+* Links related issues
+* Since GitHub issues does not allow for multiple fix versions, the migration creates a separate issue (called a backport issue) for each additional fix version and links to the original issue.
+Each backport issue has a label named "Backport" on it so they can easily be found/filtered out.
+* Each migrated issue has a Jira label added to it, so that if necessary the migration can be removed and performed again.
+* Each issue has a link to the original JIRA issue
+* Each comment has a link to the JIRA user profile of the original author
 
 The code adjudgements, that was needed for the Apache Maven Project:
 
-- create repository in organization is another REST API than create
+* create repository in organization is another REST API than create
 repository in a user space
-- Apache Jira has a path prefix in the URL
+* Apache Jira has a path prefix in the URL
 (https://issues.apache.org/jira). Currently, this fact has to be hardcoded.
+* Add a `JiraIssueFilter` that allows to set filter rules which Jira issues should be migrated. This feature is needed, if you want to split a Jira project to several repositories
 
-Configuration changes:
-
-- change application.properties to Maven Clean Plugin JIRA Project metadata
-- add Application context Configuration for Maven Clean Plugin (needed
-for label mapping etc)
+Sample `application.properties` is prepared for Maven Clean Plugin and for the Maven Shared Component Jira project (Component `maven-verifier`).
 
 
 ## How to Guide
@@ -23,7 +32,7 @@ see xref:docs/how-to-create-gh-service-account.adoc[Guide: Service Accounts in G
 
 ### Common Configuration
 
-1. Adjust `application.properties` with the metadata of the Jira projet that should migrate
+1. Adjust `application.properties` with the metadata of the Jira project that should migrate
 2. Configure the author mapping in `src/main/resources/jira-to-github-users.properties` (for jire author exporting see xref:docs/how-to-export-jira-author.adoc[Guide: How to export Jira Author])
 3. Create a Application context Configuration
 [source, java]
@@ -77,26 +86,49 @@ If you need a mechanism where you can add more context information, you can impl
 				}
 
 			}
+        }
+    }
+----
+If you want to configure the design of the Github Labels, you have to adjust the `LabelFactories` class.
+
+
+### Filtering Jira Issue for migration
+
+If not all Jira issues should be migrated, you can configure/implement an `JiraIssueFilter` in your `MigrationConfig` class.
+
+For example, you want to migration only Jira issues that have a specific component:
+
+[source, java]
+----
+	@Bean
+	public JiraIssueFilter jiraIssueFilter(@Value("${jira.component}") String componentName) {
+		return new CompositeJiraIssueFilter(new JiraIssueComponentFiler(componentName));
+	}
+
+	private static class JiraIssueComponentFiler implements JiraIssueFilter {
+
+        private final String componentName;
+
+        public JiraIssueComponentFiler(String componentName) {
+            this.componentName = componentName;
+        }
+
+		@Override
+		public boolean test(JiraIssue jiraIssue) {
+			return jiraIssue.getFields().getComponents().stream().anyMatch(jiraComponent -> jiraComponent.getName().contains(componentName));
+		}
+	}
+----
+
+### Filtering Jira Versions for migration
+
+The migration tool creates as one of the first steps GitHub milestones based on the Jira Versions. If you don't need all Jira versions, you can implement a `MilestoneFilter` in your `MigrationConfig` class.
+
+[source, java]
+----
+	@Bean
+	public MilestoneFilter milestoneFilter(@Value("${jira.component}") String componentName) {
+		return fixVersion -> fixVersion.getName().startsWith(componentName);
+	}
 
 ----
-If you want to configure the desing of the Github Labels, you have to adjust the `LabelFactories` class.
-
-
-
-## Original Content of the readme
-
-
-
-A sample of the migration from Spring Security's JIRA to GitHub issues can be found at https://github.com/rwinch/spring-security-migrate-issues/issues[rwinch/spring-security-migrate-issues]
-See `src/main/resources/application.properties` for settings. (based on the original code)
-
-Some Key Features:
-
-* Performs basic conversion from JIRA markup to GitHub markup
-* Uses GitHub's experimental https://gist.github.com/jonmagic/5282384165e0f86ef105[import issue API] for increased speed and to keep dates accurate
-* Links related issues
-* Since GitHub issues does not allow for multiple fix versions, the migration creates a separate issue (called a backport issue) for each additional fix version and links to the original issue.
-Each backport issue has a label named "Backport" on it so they can easily be found/filtered out.
-* Each migrated issue has a Jira label added to it, so that if necessary the migration can be removed and performed again.
-* Each issue has a link to the original JIRA issue
-* Each comment has a link to the JIRA user profile of the original author
