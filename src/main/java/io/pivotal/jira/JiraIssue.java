@@ -69,7 +69,7 @@ public class JiraIssue {
 	}
 
 	public String getBrowserUrlFor(String key) {
-		return UriComponentsBuilder.fromHttpUrl(self).replacePath("/browse/").path(key).toUriString();
+		return UriComponentsBuilder.fromHttpUrl(self).replacePath("jira/browse/").path(key).toUriString();
 	}
 
 	/**
