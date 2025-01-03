@@ -122,17 +122,20 @@ public class  MigrationClient {
 
 	private int importBatchSize = 100;
 
+	private final JiraIssueFilter jiraIssueFilter;
+
 
 	@Autowired
 	public MigrationClient(GithubConfig config, MarkupManager markup,
-			MilestoneFilter milestoneFilter, LabelHandler labelHandler, IssueProcessor issueProcessor) {
+                           MilestoneFilter milestoneFilter, LabelHandler labelHandler, IssueProcessor issueProcessor, JiraIssueFilter jiraIssueFilter) {
 
 		this.config = config;
 		this.markup = markup;
 		this.milestoneFilter = milestoneFilter;
 		this.labelHandler = labelHandler;
 		this.issueProcessor = issueProcessor;
-		this.importRequestBuilder =
+        this.jiraIssueFilter = jiraIssueFilter;
+        this.importRequestBuilder =
 				getRepositoryRequestBuilder(HttpMethod.POST, "/import/issues")
 						.accept(new MediaType("application", "vnd.github.golden-comet-preview+json"));
 	}
@@ -260,7 +263,7 @@ public class  MigrationClient {
 		MultiValueMap<Map<String, Object>, JiraIssue> backportMap = collectBackports(publicIssues, milestones);
 
 		logger.info("Preparing for import (wiki to markdown, select labels, format Jira details, etc)");
-		List<JiraIssue> importIssues = context.filterRemaingIssuesToImport(publicIssues);
+		List<JiraIssue> importIssues = context.filterRemaingIssuesToImport(publicIssues).stream().filter(jiraIssue -> jiraIssueFilter.test(jiraIssue)).toList();
 		List<ImportGithubIssue> importData = importIssues.stream()
 				.map(jiraIssue -> {
 					issueProcessor.beforeConversion(jiraIssue);
@@ -654,15 +657,20 @@ public class  MigrationClient {
 
 	private GithubIssue initMilestoneBackportIssue(
 			Map<String, Object> milestone, List<JiraIssue> backportIssues, MigrationContext context) {
-
+		logger.debug("Milestone data: " + milestone);
 		GithubIssue ghIssue = new GithubIssue();
 		ghIssue.setMilestone((Integer) milestone.get("number"));
 		ghIssue.setTitle(milestone.get("title") + " Backported Issues");
-		DateTime dueOnDateTime = this.dateTimeFormatter.parseDateTime((String) milestone.get("due_on"));
-		ghIssue.setCreatedAt(dueOnDateTime);
+		String dueOn = (String) milestone.get("due_on");
+		if (dueOn != null) {
+			DateTime dueOnDateTime = this.dateTimeFormatter.parseDateTime(dueOn);
+			ghIssue.setCreatedAt(dueOnDateTime);
+			if (milestone.get("state").equals("closed")) {
+				ghIssue.setClosedAt(dueOnDateTime);
+			}
+		}
 		if (milestone.get("state").equals("closed")) {
 			ghIssue.setClosed(true);
-			ghIssue.setClosedAt(dueOnDateTime);
 		}
 		String body = backportIssues.stream()
 				.map(jiraIssue -> {

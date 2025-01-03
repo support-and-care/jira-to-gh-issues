@@ -16,32 +16,27 @@
 package io.pivotal.migration;
 
 import io.pivotal.github.GithubComment;
-import io.pivotal.github.GithubIssue;
 import io.pivotal.github.ImportGithubIssue;
 import io.pivotal.jira.JiraIssue;
-import io.pivotal.jira.JiraIssueType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Arrays;
 import java.util.List;
 
 
 /**
- * Configuration for migration of SPR Jira.
+ * Configuration for migration of MSHARED Jira.
  */
 @Configuration
-@ConditionalOnProperty(name = "jira.projectId", havingValue = "MCLEAN")
-public class MCleanMigrationConfig {
-
-	private static final List<String> skipVersions =
-			Arrays.asList("Contributions Welcome", "Pending Closure", "Waiting for Triage");
+@ConditionalOnProperty(name = "jira.projectId", havingValue = "MSHARED")
+public class MSharedMigrationConfig {
 
 
 	@Bean
-	public MilestoneFilter milestoneFilter() {
-		return fixVersion -> !skipVersions.contains(fixVersion.getName());
+	public MilestoneFilter milestoneFilter(@Value("${jira.component}") String componentName) {
+		return fixVersion -> fixVersion.getName().startsWith(componentName);
 	}
 
 	@Bean
@@ -63,11 +58,6 @@ public class MCleanMigrationConfig {
 	@Bean
 	public IssueProcessor issueProcessor() {
 		return new CompositeIssueProcessor(new FixDependencyIssueProcessor(), new SkipBotCommentIssueProcessor());
-	}
-
-	@Bean
-	public JiraIssueFilter jiraIssueFilter() {
-		return new CompositeJiraIssueFilter();
 	}
 
 
@@ -92,6 +82,25 @@ public class MCleanMigrationConfig {
 					.filter(githubComment -> !(githubComment.getBody().contains("https://issues.apache.org/secure/ViewProfile.jspa?name=hudson") || githubComment.getBody().contains("https://issues.apache.org/secure/ViewProfile.jspa?name=githubbot")))
 					.toList();
 			importIssue.setComments(filteredCommentList);
+		}
+	}
+
+	@Bean
+	public JiraIssueFilter jiraIssueFilter(@Value("${jira.component}") String componentName) {
+		return new CompositeJiraIssueFilter(new JiraIssueComponentFiler(componentName));
+	}
+
+	private static class JiraIssueComponentFiler implements JiraIssueFilter {
+
+        private final String componentName;
+
+        public JiraIssueComponentFiler(String componentName) {
+            this.componentName = componentName;
+        }
+
+		@Override
+		public boolean test(JiraIssue jiraIssue) {
+			return jiraIssue.getFields().getComponents().stream().anyMatch(jiraComponent -> jiraComponent.getName().contains(componentName));
 		}
 	}
 
