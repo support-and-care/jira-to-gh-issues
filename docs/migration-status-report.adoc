@@ -9,7 +9,7 @@ The table is based on https://issues.apache.org/jira/secure/BrowseProjects.jspa?
 [cols="6*", options="header"]
 |=================================================================================================================================================================================================================================
 | key            | name                                            | GitHub Issues enabled? | Migration Tool Configuration Created? | Migration Done? | Remarks
-| MASFRES        | Apache Maven Resource Bundles                   | ❌                      | ❌                                     | ❌               |
+| MASFRES        | Apache Maven Resource Bundles                   |  ✔                      | ❌                                     |  ✔               | Nothing to do, because no Jira issues exist
 | MNG            | Maven                                           | ❌                      | ❌                                     | ❌               |
 | MACR           | Maven ACR Plugin                                | ❌                      | ❌                                     | ❌               |
 | MANTRUN        | Maven Antrun Plugin                             | ❌                      | ❌                                     | ❌               |
