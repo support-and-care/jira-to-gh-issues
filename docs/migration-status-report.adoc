@@ -68,7 +68,7 @@ The table is based on https://issues.apache.org/jira/secure/BrowseProjects.jspa?
 | MSTAGE         | Maven Stage Plugin                              | ❌                      | ❌                                     | ❌               |
 | SUREFIRE       | Maven Surefire                                  | ❌                      | ❌                                     | ❌               |
 | MTOOLCHAINS    | Maven Toolchains Plugin                         | ❌                      | ❌                                     | ❌               |
-| MVERIFIER      | Maven Verifier Plugin                           | ❌                      | ❌                                     | ❌               |
+| MVERIFIER      | Maven Verifier Plugin                           | ❌                      | ✔                                     | ❌               |
 | WAGON          | Maven Wagon                                     | ❌                      | ❌                                     | ❌               |
 | MWAR           | Maven WAR Plugin                                | ❌                      | ❌                                     | ❌               |
 | MWRAPPER       | Maven Wrapper                                   | ❌                      | ❌                                     | ❌               |
