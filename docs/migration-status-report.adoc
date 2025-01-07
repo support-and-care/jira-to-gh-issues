@@ -51,7 +51,7 @@ The table is based on https://issues.apache.org/jira/secure/BrowseProjects.jspa?
 | MPLUGIN        | Maven Plugin Tools                              | ❌                      | ❌                                     | ❌               |
 | MPMD           | Maven PMD Plugin                                | ❌                      | ❌                                     | ❌               |
 | MPIR           | Maven Project Info Reports Plugin               | ❌                      | ❌                                     | ❌               |
-| MNGSITE        | Maven Project Web Site (Moved to GitHub Issues) | ❌                      | ❌                                     | ❌               |
+| MNGSITE        | Maven Project Web Site (Moved to GitHub Issues) | ✔                      | ✔                                     | ❌               | Only migrate open issues
 | MRAR           | Maven RAR Plugin                                | ❌                      | ❌                                     | ❌               |
 | MRELEASE       | Maven Release Plugin                            | ❌                      | ❌                                     | ❌               |
 | MRRESOURCES    | Maven Remote Resources Plugin                   | ❌                      | ❌                                     | ❌               |
