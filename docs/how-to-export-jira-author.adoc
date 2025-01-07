@@ -1,6 +1,16 @@
 # Guide: Export Jira Author
 
+Two options are available:
+
+## Option 1: Manually with CLI magic
+
 1. csv export of the jira project
-2. Delete all column except 'Reporter'
+2. Delete all column except 'Assignee'
 3. `cat export.csv | cut -d ',' -f 1 | sort | uniq`
-4.  Ignore value `Reporter`
+4.  Ignore value `Assignee`
+
+
+## Option 2: Run `io.pivotal.pre.AssigneesReport`
+
+1. Configure `jira.projectId` and `jira.base-url` in the `application.properties`
+2. Run `AssigneesReport`
