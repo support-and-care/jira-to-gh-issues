@@ -31,6 +31,6 @@ public class JiraUser {
 	String self;
 
 	public String getBrowserUrl() {
-		return UriComponentsBuilder.fromHttpUrl(self).replacePath("/secure/ViewProfile.jspa").replaceQuery("").queryParam("name",key).toUriString();
+		return UriComponentsBuilder.fromHttpUrl(self).replacePath("jira/secure/ViewProfile.jspa").replaceQuery("").queryParam("name",key).toUriString();
 	}
 }

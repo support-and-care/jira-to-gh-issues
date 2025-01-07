@@ -89,7 +89,7 @@ public class MCleanMigrationConfig {
 		@Override
 		public void beforeImport(JiraIssue jiraIssue, ImportGithubIssue importIssue) {
 			List<GithubComment> filteredCommentList = importIssue.getComments().stream()
-					.filter(githubComment -> !(githubComment.getBody().contains("https://issues.apache.org/secure/ViewProfile.jspa?name=hudson") || githubComment.getBody().contains("https://issues.apache.org/secure/ViewProfile.jspa?name=githubbot")))
+					.filter(githubComment -> !(githubComment.getBody().contains("https://issues.apache.org/jira/secure/ViewProfile.jspa?name=hudson") || githubComment.getBody().contains("https://issues.apache.org/jira/secure/ViewProfile.jspa?name=githubbot")))
 					.toList();
 			importIssue.setComments(filteredCommentList);
 		}
