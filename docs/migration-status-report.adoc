@@ -42,7 +42,7 @@ The table is based on https://issues.apache.org/jira/secure/BrowseProjects.jspa?
 | MJAVADOC       | Maven Javadoc Plugin                            | ❌                      | ❌                                     | ❌               |
 | MJDEPRSCAN     | Maven JDeprScan Plugin                          | ❌                      | ❌                                     | ❌               |
 | MJDEPS         | Maven JDeps Plugin                              | ❌                      | ❌                                     | ❌               |
-| MJLINK         | Maven JLink Plugin                              | ❌                      | ❌                                     | ❌               |
+| MJLINK         | Maven JLink Plugin                              | ❌                      | ✔                                     | ❌               |
 | MJMOD          | Maven JMod Plugin                               | ❌                      | ❌                                     | ❌               |
 | JXR            | Maven JXR                                       | ❌                      | ❌                                     | ❌               |
 | MLINKCHECK     | Maven Linkcheck Plugin                          | ❌                      | ❌                                     | ❌               |
