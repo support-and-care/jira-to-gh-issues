@@ -1,0 +1,127 @@
+# Apache Maven Migration Status Report
+:icons:
+
+## All Jira project with project category 'Maven'
+
+The table is based on https://issues.apache.org/jira/secure/BrowseProjects.jspa?selectedCategory=10510&selectedProjectType=software&sortColumn=name&sortOrder=ascending[Apache Jira projects] that has the project category `Maven` and are not retired:
+
+
+[cols="6*", options="header"]
+|=================================================================================================================================================================================================================================
+| key            | name                                            | GitHub Issues enabled? | Migration Tool Configuration Created? | Migration Done? | Remarks
+| MASFRES        | Apache Maven Resource Bundles                   | ❌                      | ❌                                     | ❌               |
+| MNG            | Maven                                           | ❌                      | ❌                                     | ❌               |
+| MACR           | Maven ACR Plugin                                | ❌                      | ❌                                     | ❌               |
+| MANTRUN        | Maven Antrun Plugin                             | ❌                      | ❌                                     | ❌               |
+| ARCHETYPE      | Maven Archetype                                 | ❌                      | ❌                                     | ❌               |
+| MARCHETYPES    | Maven Archetype Bundles                         | ❌                      | ❌                                     | ❌               |
+| MARTIFACT      | Maven Artifact Plugin                           | ❌                      | ❌                                     | ❌               |
+| MASSEMBLY      | Maven Assembly Plugin                           | ❌                      | ❌                                     | ❌               |
+| MBUILDCACHE    | Maven Build Cache Extension                     | ❌                      | ❌                                     | ❌               |
+| MCHANGELOG     | Maven Changelog Plugin                          | ❌                      | ❌                                     | ❌               |
+| MCHANGES       | Maven Changes Plugin                            | ❌                      | ❌                                     | ❌               |
+| MCHECKSTYLE    | Maven Checkstyle Plugin                         | ❌                      | ❌                                     | ❌               |
+| MCLEAN         | Maven Clean Plugin                              | ❌                      | ✔                                     | ❌               |
+| MCOMPILER      | Maven Compiler Plugin                           | ❌                      | ❌                                     | ❌               |
+| MDEP           | Maven Dependency Plugin                         | ❌                      | ❌                                     | ❌               |
+| MDEPLOY        | Maven Deploy Plugin                             | ❌                      | ❌                                     | ❌               |
+| MDOAP          | Maven DOAP Plugin                               | ❌                      | ❌                                     | ❌               |
+| DOXIA          | Maven Doxia                                     | ❌                      | ❌                                     | ❌               |
+| DOXIASITETOOLS | Maven Doxia Sitetools                           | ❌                      | ❌                                     | ❌               |
+| DOXIATOOLS     | Maven Doxia Tools                               | ❌                      | ❌                                     | ❌               |
+| MEAR           | Maven EAR Plugin                                | ❌                      | ❌                                     | ❌               |
+| MEJB           | Maven EJB Plugin                                | ❌                      | ❌                                     | ❌               |
+| MENFORCER      | Maven Enforcer Plugin                           | ❌                      | ❌                                     | ❌               |
+| MGPG           | Maven GPG Plugin                                | ❌                      | ❌                                     | ❌               |
+| MPH            | Maven Help Plugin                               | ❌                      | ❌                                     | ❌               |
+| MINDEXER       | Maven Indexer                                   | ❌                      | ❌                                     | ❌               |
+| MINSTALL       | Maven Install Plugin                            | ❌                      | ❌                                     | ❌               |
+| MINVOKER       | Maven Invoker Plugin                            | ❌                      | ❌                                     | ❌               |
+| MJAR           | Maven JAR Plugin                                | ❌                      | ❌                                     | ❌               |
+| MJARSIGNER     | Maven Jar Signer Plugin                         | ❌                      | ❌                                     | ❌               |
+| MJAVADOC       | Maven Javadoc Plugin                            | ❌                      | ❌                                     | ❌               |
+| MJDEPRSCAN     | Maven JDeprScan Plugin                          | ❌                      | ❌                                     | ❌               |
+| MJDEPS         | Maven JDeps Plugin                              | ❌                      | ❌                                     | ❌               |
+| MJLINK         | Maven JLink Plugin                              | ❌                      | ❌                                     | ❌               |
+| MJMOD          | Maven JMod Plugin                               | ❌                      | ❌                                     | ❌               |
+| JXR            | Maven JXR                                       | ❌                      | ❌                                     | ❌               |
+| MLINKCHECK     | Maven Linkcheck Plugin                          | ❌                      | ❌                                     | ❌               |
+| MPDF           | Maven PDF Plugin                                | ❌                      | ❌                                     | ❌               |
+| MPLUGINTESTING | Maven Plugin Testing                            | ❌                      | ❌                                     | ❌               |
+| MPLUGIN        | Maven Plugin Tools                              | ❌                      | ❌                                     | ❌               |
+| MPMD           | Maven PMD Plugin                                | ❌                      | ❌                                     | ❌               |
+| MPIR           | Maven Project Info Reports Plugin               | ❌                      | ❌                                     | ❌               |
+| MNGSITE        | Maven Project Web Site (Moved to GitHub Issues) | ❌                      | ❌                                     | ❌               |
+| MRAR           | Maven RAR Plugin                                | ❌                      | ❌                                     | ❌               |
+| MRELEASE       | Maven Release Plugin                            | ❌                      | ❌                                     | ❌               |
+| MRRESOURCES    | Maven Remote Resources Plugin                   | ❌                      | ❌                                     | ❌               |
+| MRESOLVER      | Maven Resolver                                  | ❌                      | ❌                                     | ❌               |
+| MRESOURCES     | Maven Resources Plugin                          | ❌                      | ❌                                     | ❌               |
+| SCM            | Maven SCM                                       | ❌                      | ❌                                     | ❌               |
+| MSCMPUB        | Maven SCM Publish Plugin                        | ❌                      | ❌                                     | ❌               |
+| MSCRIPTING     | Maven Scripting                                 | ❌                      | ❌                                     | ❌               |
+| MSHADE         | Maven Shade Plugin                              | ❌                      | ❌                                     | ❌               |
+| MSHARED        | Maven Shared Components                         | ❌                      | ❌                                     | ❌               | This project has to be splitted in many repositories. See also below table
+| MSITE          | Maven Site Plugin                               | ✔                      | ❌                                     | ❌               |
+| MSKINS         | Maven Skins                                     | ❌                      | ❌                                     | ❌               | This project has to be splitted in many repositories. See also below table
+| MSOURCES       | Maven Source Plugin                             | ❌                      | ❌                                     | ❌               |
+| MSTAGE         | Maven Stage Plugin                              | ❌                      | ❌                                     | ❌               |
+| SUREFIRE       | Maven Surefire                                  | ❌                      | ❌                                     | ❌               |
+| MTOOLCHAINS    | Maven Toolchains Plugin                         | ❌                      | ❌                                     | ❌               |
+| MVERIFIER      | Maven Verifier Plugin                           | ❌                      | ❌                                     | ❌               |
+| WAGON          | Maven Wagon                                     | ❌                      | ❌                                     | ❌               |
+| MWAR           | Maven WAR Plugin                                | ❌                      | ❌                                     | ❌               |
+| MWRAPPER       | Maven Wrapper                                   | ❌                      | ❌                                     | ❌               |
+| MMETRIC        | The Maven Metric Extension                      | ❌                      | ❌                                     | ✔               | Nothing to do, because no Jira issues exist
+|=================================================================================================================================================================================================================================
+
+## Jira Projects, that have to be splitted
+
+### Shared Component
+This list is necessary, because the Shared Component Jira Project should be split in many repositories.
+
+[cols="4*", options="header"]
+|===================================================================================
+| Shared Component Name         | GitHub Issues Enabled? | Migration Done? | Remarks
+| file-management               | ❌                      | ❌               |
+| maven-ant                     | ❌                      | ❌               |
+| maven-app-configuration       | ❌                      | ❌               |
+| maven-archiver                | ❌                      | ❌               |
+| maven-artifact-transfer       | ❌                      | ❌               |
+| maven-common-artifact-filters | ❌                      | ❌               |
+| maven-dependency-analyzer     | ❌                      | ❌               |
+| maven-dependency-tree         | ❌                      | ❌               |
+| maven-doxia-tools             | ❌                      | ❌               |
+| maven-filtering               | ❌                      | ❌               |
+| maven-invoker                 | ❌                      | ❌               |
+| maven-jarsigner               | ❌                      | ❌               |
+| maven-mapping                 | ❌                      | ❌               |
+| maven-project-utils           | ❌                      | ❌               |
+| maven-reporting-api           | ❌                      | ❌               |
+| maven-reporting-exec          | ❌                      | ❌               |
+| maven-reporting-impl          | ❌                      | ❌               |
+| maven-script                  | ❌                      | ❌               |
+| maven-script-interpreter      | ❌                      | ❌               |
+| maven-shared-incremental      | ❌                      | ❌               |
+| maven-shared-io               | ❌                      | ❌               |
+| maven-shared-jar              | ❌                      | ❌               |
+| maven-shared-monitor          | ❌                      | ❌               |
+| maven-shared-resources        | ❌                      | ❌               |
+| maven-shared-utils            | ❌                      | ❌               |
+| maven-verifier                | ❌                      | ❌               |
+|===================================================================================
+
+
+### Skin Components
+This list is necessary, because the Skin Component Jira Project should be split in many repositories.
+The retired components are not listed here.
+
+[cols="4*", options="header"]
+|=========================================================================
+| Skin Component Name | Github Issues Enabled? | Migration Done? | Remarks
+| Default Skin        | ❌                      | ❌               |
+| Fluido Skin         | ❌                      | ❌               |
+|=========================================================================
+
+
+

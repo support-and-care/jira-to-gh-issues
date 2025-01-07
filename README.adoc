@@ -13,7 +13,7 @@ Each backport issue has a label named "Backport" on it so they can easily be fou
 * Each issue has a link to the original JIRA issue
 * Each comment has a link to the JIRA user profile of the original author
 
-The code adjudgements, that was needed for the Apache Maven Project:
+The code adjustments, that was needed for the Apache Maven Project:
 
 * create repository in organization is another REST API than create
 repository in a user space
@@ -23,6 +23,9 @@ repository in a user space
 
 Sample `application.properties` is prepared for Maven Clean Plugin and for the Maven Shared Component Jira project (Component `maven-verifier`).
 
+## Migration Status Reporting
+
+A xref:docs/migration-status-report.adoc[separate page] is created to monitor the progress.
 
 ## How to Guide
 
