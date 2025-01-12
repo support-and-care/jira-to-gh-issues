@@ -132,6 +132,7 @@ public class JiraIssue {
 		JiraUser reporter;
 		JiraUser assignee;
 		List<IssueLink> issuelinks;
+		List<RemoteLink> remoteLinks = Collections.emptyList();
 		JiraIssue parent;
 		List<JiraIssue> subtasks;
 		List<String> labels;

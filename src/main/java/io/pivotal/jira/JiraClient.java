@@ -27,6 +27,7 @@ import io.pivotal.util.ProgressTracker;
 import lombok.Data;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -98,7 +99,9 @@ public class JiraClient {
 	}
 
 	private Mono<List<JiraIssue>> getAndCollectIssues(String jql) {
-		return getIssues(jql).collectList()
+		return getIssues(jql).flatMap(
+				issue -> findRemoteLinks(issue)
+				).collectList()
 				.doOnNext(issues -> {
 					logger.info("Found {} issues", issues.size());
 
@@ -109,6 +112,26 @@ public class JiraClient {
 
 					issues.forEach(issue -> issue.initFixAndBackportVersions(backportSubtasks));
 				});
+	}
+
+	private Publisher<JiraIssue> findRemoteLinks(JiraIssue issue) {
+		return webClient.get()
+				.uri("/issue/{issueKey}/remotelink", issue.getKey())
+				.retrieve()
+				.bodyToFlux(RemoteLink.class)
+				.collectList()
+				.map(
+						remoteLinks -> {
+							if (!remoteLinks.isEmpty()) {
+								logger.info("Found {} remote links for issue {}", remoteLinks.size(), issue.getKey());
+								issue.getFields().setRemoteLinks(
+										remoteLinks
+								);
+							}
+
+							return issue;
+						}
+				);
 	}
 
 	private Flux<JiraIssue> getIssues(String jql) {

@@ -42,6 +42,7 @@ import io.pivotal.jira.JiraIssue;
 import io.pivotal.jira.JiraIssue.Fields;
 import io.pivotal.jira.JiraUser;
 import io.pivotal.jira.JiraVersion;
+import io.pivotal.jira.RemoteLink;
 import io.pivotal.util.MarkupEngine;
 import io.pivotal.util.MarkupManager;
 import io.pivotal.util.ProgressTracker;
@@ -516,6 +517,15 @@ public class  MigrationClient {
 								(!SUPPRESSED_LINK_TYPES.contains(linkType) ? " (_**\"" + linkType + "\"**_)" : "");
 					})
 					.collect(Collectors.joining("\n", "\n**Issue Links:**\n", "\n"));
+		}
+		List<RemoteLink> remoteLinks = fields.getRemoteLinks();
+		if (!remoteLinks.isEmpty()) {
+			jiraDetails += remoteLinks.stream()
+					.map(link -> {
+						String title = engine.convert(link.getTitle()); // escape annotations (colliding with GitHub mentions)
+						return "- " + engine.link(title, link.getUrl());
+					})
+					.collect(Collectors.joining("\n", "\n**Remote Links:**\n", "\n"));
 		}
 		List<String> references = new ArrayList<>();
 		if (fields.getPullRequestUrl() != null) {
