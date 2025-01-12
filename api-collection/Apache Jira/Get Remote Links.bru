@@ -1,0 +1,19 @@
+meta {
+  name: Get Remote Links
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://issues.apache.org/jira/rest/api/2/issue/{{issueKey}}/remotelink
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+vars:pre-request {
+  issueKey: ARCHETYPE-626
+}

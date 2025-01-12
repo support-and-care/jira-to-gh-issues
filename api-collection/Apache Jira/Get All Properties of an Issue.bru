@@ -1,0 +1,19 @@
+meta {
+  name: Get All Properties of an Issue
+  type: http
+  seq: 3
+}
+
+get {
+  url: http:///issues.apache.org/jira/rest/api/2/issue/{{issueKey}}/properties
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+vars:pre-request {
+  issueKey: ARCHETYPE-626
+}

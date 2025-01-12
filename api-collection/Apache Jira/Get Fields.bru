@@ -1,0 +1,19 @@
+meta {
+  name: Get Fields
+  type: http
+  seq: 5
+}
+
+get {
+  url: http://issues.apache.org/jira/rest/api/2/issue/{{issueKey}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+vars:pre-request {
+  issueKey: ARCHETYPE-626
+}

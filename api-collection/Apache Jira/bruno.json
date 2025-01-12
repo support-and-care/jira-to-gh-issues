@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "Apache Jira",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
