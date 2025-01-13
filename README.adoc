@@ -25,7 +25,7 @@ Sample `application.properties` is prepared for Maven Clean Plugin and for the M
 
 ## Migration Status Reporting
 
-A xref:docs/migration-status-report.adoc[separate page] is created to monitor the progress.
+see https://cwiki.apache.org/confluence/display/MAVEN/JIRA+to+GitHub+Issues+switching[Apache Maven CWiki - JIRA to GitHub Issues switching]
 
 ## How to Guide
 
