@@ -25,16 +25,18 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Arrays;
 import java.util.List;
 
+import static io.pivotal.migration.LabelFactories.TYPE_LABEL;
+
 
 /**
  * Configuration for migration of SPR Jira.
  */
 @Configuration
-@ConditionalOnProperty(name = "jira.projectId", havingValue = "ARCHETYPE")
-public class MArchetpeMigrationConfig {
+@ConditionalOnProperty(name = "jira.projectId", havingValue = "MASSEMBLY")
+public class MAssemblyMigrationConfig {
 
 	private static final List<String> skipVersions =
-			Arrays.asList("Contributions Welcome", "Pending Closure", "Waiting for Triage");
+			Arrays.asList("Contributions Welcome", "", "");
 
 
 	@Bean
@@ -50,6 +52,8 @@ public class MArchetpeMigrationConfig {
 		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "New Feature", "enhancement");
 		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "Task", "maintenance");
 		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "Dependency Upgrade", "dependencies");
+		//fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.VERSION, "waiting-for-feedback", "waiting-for-feedback", TYPE_LABEL);
+
 
 		CompositeLabelHandler handler = new CompositeLabelHandler();
 		handler.addLabelHandler(fieldValueHandler);

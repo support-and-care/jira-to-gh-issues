@@ -21,14 +21,12 @@ import org.springframework.context.annotation.Import;
 
 
 /**
- * Configuration for migration of Apache Maven Jira Project MCLEAN.
+ * Configuration for migration of SPR Jira.
  */
 @Configuration
-@ConditionalOnProperty(name = "jira.projectId", havingValue = "MCLEAN")
-@Import({CommonApacheMavenMigrationConfig.class})
-public class MCleanMigrationConfig {
-
-
+@Import(CommonApacheMavenMigrationConfig.class)
+@ConditionalOnProperty(name = "jira.projectId", havingValue = "ARCHETYPE")
+public class MArchetypeMigrationConfig {
 
 
 }
