@@ -20,6 +20,8 @@ repository in a user space
 * Apache Jira has a path prefix in the URL
 (https://issues.apache.org/jira). Currently, this fact has to be hardcoded.
 * Add a `JiraIssueFilter` that allows to set filter rules which Jira issues should be migrated. This feature is needed, if you want to split a Jira project to several repositories
+* Jire Remote Links are supported. They are added as text into the issue body (similar to Jira Links).
+* Add Label mapping for Jira field `priority`
 
 Sample `application.properties` is prepared for Maven Clean Plugin and for the Maven Shared Component Jira project (Component `maven-verifier`).
 
