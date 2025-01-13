@@ -39,7 +39,7 @@ public class JiraIssue {
 	public static final String FIELD_NAMES = "summary,comment,assignee,components,created,creator," +
 			"description,versions,fixVersions,issuetype,reporter,resolution,status,issuelinks," +
 			"resolution,updated,parent,subtasks,labels,attachment,watches," +
-			"customfield_10120,customfield_10684,security";
+			"customfield_10120,customfield_10684,security,priority";
 
 
 	String id;
@@ -128,6 +128,7 @@ public class JiraIssue {
 		List<JiraVersion> versions;
 		List<JiraFixVersion> fixVersions;
 		JiraStatus status;
+		JiraPriority priority;
 		JiraResolution resolution;
 		JiraUser reporter;
 		JiraUser assignee;

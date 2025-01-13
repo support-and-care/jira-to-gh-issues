@@ -47,6 +47,8 @@ public class FieldValueLabelHandler implements LabelHandler {
 
 		COMPONENT(LabelFactories.IN_LABEL),
 
+		PRIORITY(LabelFactories.PRIORITY_LABEL),
+
 		VERSION(null),
 
 		LABEL(null);
@@ -112,6 +114,9 @@ public class FieldValueLabelHandler implements LabelHandler {
 		if (fields.getLabels() != null) {
 			fields.getLabels().forEach(label ->
 					addLabel(labels, getKey(FieldType.LABEL, label)));
+		}
+		if (fields.getPriority() != null) {
+			addLabel(labels, getKey(FieldType.PRIORITY, fields.getPriority().getName()));
 		}
 		return labels;
 	}

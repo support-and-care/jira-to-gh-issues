@@ -16,14 +16,13 @@
 package io.pivotal.migration;
 
 import io.pivotal.github.GithubComment;
-import io.pivotal.github.GithubIssue;
 import io.pivotal.github.ImportGithubIssue;
 import io.pivotal.jira.JiraIssue;
-import io.pivotal.jira.JiraIssueType;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,6 +52,12 @@ public class MCleanMigrationConfig {
 		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "Task", "maintenance");
 		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "Dependency Upgrade", "dependencies");
 
+		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.PRIORITY, "Blocker", "blocker");
+		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.PRIORITY, "Critical", "critical");
+		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.PRIORITY, "Major", "major");
+		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.PRIORITY, "Minor", "minor");
+		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.PRIORITY, "Trivial", "trivial");
+
 		CompositeLabelHandler handler = new CompositeLabelHandler();
 		handler.addLabelHandler(fieldValueHandler);
 
@@ -78,7 +83,10 @@ public class MCleanMigrationConfig {
 			if (jiraIssue.getFields().getIssuetype().getName().equals("Task") ||
 			jiraIssue.getFields().getIssuetype().getName().equals("Improvement")) {
 				if(jiraIssue.getFields().getSummary().contains("Bump") || jiraIssue.getFields().getSummary().contains("Upgrade")) {
-					githubIssue.getIssue().setLabels(List.of("dependencies"));
+					List<String> labels = githubIssue.getIssue().getLabels().stream().filter(label ->  label.contains("priority:")).toList();
+					List<String> newLabels = new ArrayList<>(labels);
+					newLabels.add("dependencies");
+					githubIssue.getIssue().setLabels(newLabels);
 				}
 
 			}

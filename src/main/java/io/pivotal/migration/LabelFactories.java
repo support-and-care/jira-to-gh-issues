@@ -33,6 +33,8 @@ public class LabelFactories {
 
 	public static final Function<String, Map<String, String>> HAS_LABEL = name -> create("has: ", name, "dfdfdf");
 
+	public static final Function<String, Map<String, String>> PRIORITY_LABEL = name -> create("priority: ", name, "cc0000");
+
 
 	private static Map<String, String> create(String prefix, String labelName, String color) {
 		Map<String, String> map = new LinkedHashMap<>();
