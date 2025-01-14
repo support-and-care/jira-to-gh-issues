@@ -100,7 +100,7 @@ public class JiraClient {
 
 	private Mono<List<JiraIssue>> getAndCollectIssues(String jql) {
 		return getIssues(jql).flatMap(
-				issue -> findRemoteLinks(issue)
+                        this::findRemoteLinks
 				).collectList()
 				.doOnNext(issues -> {
 					logger.info("Found {} issues", issues.size());
@@ -123,7 +123,7 @@ public class JiraClient {
 				.map(
 						remoteLinks -> {
 							if (!remoteLinks.isEmpty()) {
-								logger.info("Found {} remote links for issue {}", remoteLinks.size(), issue.getKey());
+								logger.debug("Found {} remote links for issue {}", remoteLinks.size(), issue.getKey());
 								issue.getFields().setRemoteLinks(
 										remoteLinks
 								);

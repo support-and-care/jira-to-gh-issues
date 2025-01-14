@@ -49,7 +49,7 @@ public class FieldValueLabelHandler implements LabelHandler {
 
 		PRIORITY(LabelFactories.PRIORITY_LABEL),
 
-		VERSION(null),
+		VERSION(LabelFactories.TYPE_LABEL),
 
 		LABEL(null);
 

@@ -12,7 +12,7 @@ import java.util.List;
 public class CommonApacheMavenMigrationConfig {
 
     private static final List<String> skipVersions =
-            Arrays.asList("Contributions Welcome", "Pending Closure", "Waiting for Triage");
+            Arrays.asList("Contributions Welcome", "Pending Closure", "Waiting for Triage", "waiting-for-feedback", "backlog", "more-investigation");
 
 
     @Bean
@@ -34,6 +34,10 @@ public class CommonApacheMavenMigrationConfig {
         fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.PRIORITY, "Major", "major");
         fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.PRIORITY, "Minor", "minor");
         fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.PRIORITY, "Trivial", "trivial");
+
+        fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.VERSION, "waiting-for-feedback", "waiting-for-feedback");
+        fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.VERSION, "more-investigation", "help wanted");
+
 
         CompositeLabelHandler handler = new CompositeLabelHandler();
         handler.addLabelHandler(fieldValueHandler);
