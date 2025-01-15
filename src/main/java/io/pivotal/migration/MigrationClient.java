@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ibm.icu.impl.ValidIdentifiers;
 import io.pivotal.github.GitHubRestTemplate;
 import io.pivotal.github.GithubComment;
 import io.pivotal.github.GithubConfig;
@@ -64,6 +65,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.RequestEntity.BodyBuilder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -199,7 +201,10 @@ public class  MigrationClient {
 
 	public void createMilestones(List<JiraVersion> versions) {
 		BodyBuilder requestBuilder = getRepositoryRequestBuilder(HttpMethod.POST, "/milestones");
-		versions = versions.stream().filter(milestoneFilter).collect(Collectors.toList());
+		MilestoneFilter alreadyExistingMilestonesFilter = findExistingMilestones();
+		versions = versions.stream().filter(milestoneFilter)
+									.filter(alreadyExistingMilestonesFilter)
+									.collect(Collectors.toList());
 		logger.info("Creating {} milestones", versions.size());
 		ProgressTracker tracker = new ProgressTracker(versions.size(), 1, 50, logger.isDebugEnabled());
 		for (JiraVersion version : versions) {
@@ -213,6 +218,15 @@ public class  MigrationClient {
 			this.getRest().exchange(requestBuilder.body(map), MAP_TYPE);
 		}
 		tracker.stopProgress();
+	}
+
+	private MilestoneFilter findExistingMilestones() {
+		BodyBuilder requestBuilder = getRepositoryRequestBuilder(HttpMethod.GET, "/milestones");
+		List<String> existingMilestones =this.getRest().exchange(requestBuilder.build(), LIST_OF_MAPS_TYPE)
+				.getBody().stream()
+							.map(milestone -> (String) milestone.get("title"))
+							.toList();
+		return jiraVersion -> !existingMilestones.contains(jiraVersion.getName());
 	}
 
 	public void createLabelsIfNotExist() {

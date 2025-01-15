@@ -1,0 +1,21 @@
+meta {
+  name: Get Milestones
+  type: http
+  seq: 2
+}
+
+get {
+  url: https://api.github.com/repos/support-and-care/mvn-issues-migration-test-mclean/milestones
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/vnd.github+json
+  Authorization: Bearer {GITHUB_TOKEN}
+  X-GitHub-Api-Version: 2022-11-28
+}
+
+vars:pre-request {
+  GITHUB_TOKEN: 
+}
