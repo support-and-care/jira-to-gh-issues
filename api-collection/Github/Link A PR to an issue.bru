@@ -1,0 +1,28 @@
+meta {
+  name: Link A PR to an issue
+  type: http
+  seq: 3
+}
+
+post {
+  url: https://api.github.com/repos/support-and-care/jira-to-gh-issue-dummy-repo/issues/{{issueNumber}}/comments
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept: application/vnd.github+json
+  X-GitHub-Api-Version: 2022-11-28
+}
+
+auth:bearer {
+  token:
+}
+
+body:json {
+  {"body":"Resolve #4"}
+}
+
+vars:pre-request {
+  issueNumber: 1
+}

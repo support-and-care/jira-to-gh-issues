@@ -29,11 +29,11 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ibm.icu.impl.ValidIdentifiers;
 import io.pivotal.github.GitHubRestTemplate;
 import io.pivotal.github.GithubComment;
 import io.pivotal.github.GithubConfig;
 import io.pivotal.github.GithubIssue;
+import io.pivotal.github.GithubPullRequest;
 import io.pivotal.github.ImportGithubIssue;
 import io.pivotal.jira.IssueLink;
 import io.pivotal.jira.JiraAttachment;
@@ -65,7 +65,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.RequestEntity.BodyBuilder;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -285,6 +284,7 @@ public class  MigrationClient {
 					ImportGithubIssue issueToImport = new ImportGithubIssue();
 					issueToImport.setIssue(initGithubIssue(jiraIssue, milestones, restrictedIssueKeys));
 					issueToImport.setComments(initComments(jiraIssue));
+					issueToImport.setPullRequest(initPullRequest(jiraIssue));
 					issueProcessor.beforeImport(jiraIssue, issueToImport);
 					return issueToImport;
 				})
@@ -320,6 +320,9 @@ public class  MigrationClient {
 			return;
 		}
 
+		logger.info("Linking pull requests");
+		importedIssues.forEach(issue -> executeLinkPullRequest(issue, context));
+
 		logger.info("{} backport issue holders to create", backportMap.size());
 		if (backportMap.isEmpty()) {
 			return;
@@ -351,6 +354,50 @@ public class  MigrationClient {
 					.collect(Collectors.toList());
 			logger.error("Failed:\n" + failed + "\nSucceeded:\n" + succeeded);
 		}
+	}
+
+	private void executeLinkPullRequest(ImportedIssue importedIssue, MigrationContext context) {
+		int issueNumber = importedIssue.getIssueNumber();
+		List<GithubPullRequest> relatedPullRequests = importedIssue.getImportResponse().getImportIssue().getPullRequest();
+
+		relatedPullRequests.forEach(pullRequest -> {
+
+			Throwable failure = null;
+            try {
+                BodyBuilder bodyBuilder = pullRequestRequestBuilder(pullRequest.getNumber());
+                GithubComment githubComment = new GithubComment();
+                githubComment.setBody("Resolve #" + issueNumber);
+                RequestEntity<GithubComment> request = bodyBuilder.body(githubComment);
+                getRest().exchange(request, String.class);
+            } catch (Throwable ex) {
+				failure = ex;
+			}
+			if (failure != null) {
+				String message = "Failed to POST link pull request for \"" + importedIssue.getImportResponse().getImportIssue().getIssue().getTitle() + "\"";
+				logger.error(message, failure.getMessage());
+				context.addFailureMessage(message + ": " + failure.getMessage());
+			}
+        });
+
+	}
+
+	private BodyBuilder pullRequestRequestBuilder(int number) {
+		String url = GITHUB_URL + "/repos/" + this.config.getRepositorySlug() + "/issues/" + number + "/comments";
+		return RequestEntity.method(HttpMethod.POST, URI.create(url))
+				.header(HttpHeaders.AUTHORIZATION, "token " + this.config.getAccessToken());
+	}
+
+	private List<GithubPullRequest> initPullRequest(JiraIssue jiraIssue) {
+		return jiraIssue.getFields().getRemoteLinks().stream()
+				.filter(remoteLink -> remoteLink.getTitle()
+				.contains("GitHub Pull Request"))
+				.map(remoteLink -> {
+					logger.debug("For JiraIssue {}, PullRequest {} found", jiraIssue.getKey(), remoteLink.getTitle());
+					String[] splittedUrl = remoteLink.getUrl().split("/");
+					return new GithubPullRequest(Integer.parseInt(splittedUrl[splittedUrl.length-1]));
+				}).toList();
+
+
 	}
 
 	private Map<String, JiraUser> collectUsers(List<JiraIssue> issues) {

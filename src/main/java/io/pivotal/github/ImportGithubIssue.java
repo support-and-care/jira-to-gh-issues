@@ -18,6 +18,7 @@ package io.pivotal.github;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
@@ -28,6 +29,8 @@ import lombok.Data;
 public class ImportGithubIssue {
 	private GithubIssue issue;
 	private List<GithubComment> comments = new ArrayList<>();
+	@JsonIgnore
+	private List<GithubPullRequest> pullRequest = new ArrayList<>();
 
 	@Override
 	public String toString() {
