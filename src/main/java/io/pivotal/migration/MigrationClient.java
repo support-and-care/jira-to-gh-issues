@@ -320,8 +320,11 @@ public class  MigrationClient {
 			return;
 		}
 
-		logger.info("Linking pull requests");
-		importedIssues.forEach(issue -> executeLinkPullRequest(issue, context));
+		if(!config.isDeleteCreateRepositorySlug()) {
+			// Because linking pull request triggers events and it should not run at testing.
+			logger.info("Linking pull requests");
+			importedIssues.forEach(issue -> executeLinkPullRequest(issue, context));
+		}
 
 		logger.info("{} backport issue holders to create", backportMap.size());
 		if (backportMap.isEmpty()) {
