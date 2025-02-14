@@ -687,7 +687,14 @@ public class  MigrationClient {
 					.accept(new MediaType("application", "vnd.github.golden-comet-preview+json"))
 					.header("Authorization", "token " + this.config.getAccessToken())
 					.build();
+			int retries = 0;
+			int maxRetries = 5;
 			while (true) {
+				if (retries == maxRetries) {
+					logger.error("Import for [" + jiraIssue.getKey() + "] failed after " + retries + " retries");
+					return false; // we see as error because we dont want to linking pr to pending issues
+				}
+				retries++;
 				Map<String, Object> body;
 				try {
 					body = getRest().exchange(request, MAP_TYPE).getBody();
