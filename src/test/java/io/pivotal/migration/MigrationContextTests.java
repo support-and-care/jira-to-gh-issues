@@ -32,7 +32,8 @@ public class MigrationContextTests {
 
 	private final Writer mappingsWriter = new StringWriter();
 	private final Writer failuresWriter = new StringWriter();
-	private final MigrationContext context = new MigrationContext(mappingsWriter, failuresWriter);
+	private final Writer pendingWriter = new StringWriter();
+	private final MigrationContext context = new MigrationContext(mappingsWriter, failuresWriter, pendingWriter);
 
 
 	@Test
