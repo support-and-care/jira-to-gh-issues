@@ -30,7 +30,7 @@ public class RateLimitHelper {
 
 	private static final Mono<Object> parentMono = Mono.just("foo");
 
-	private final Duration timeBetweenCalls = Duration.ofSeconds(1);
+	private final Duration timeBetweenCalls = Duration.ofSeconds(2);
 
 	private Mono<Object> nextPermit;
 
