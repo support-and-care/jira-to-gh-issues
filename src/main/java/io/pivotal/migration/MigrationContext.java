@@ -37,18 +37,20 @@ public class MigrationContext {
 	private final Writer mappingsWriter;
 
 	private final Writer failuresWriter;
+    private final Writer pendingWriter;
 
-	private final Map<String, Integer> issueMappings = new HashMap<>();
+    private final Map<String, Integer> issueMappings = new HashMap<>();
 
 	private int failedImportCount;
 
 	private int backportIssueHolderCount;
 
 
-	public MigrationContext(Writer mappingsWriter, Writer failuresWriter) {
+	public MigrationContext(Writer mappingsWriter, Writer failuresWriter, Writer pendingWriter) {
 		this.mappingsWriter = mappingsWriter;
 		this.failuresWriter = failuresWriter;
-	}
+        this.pendingWriter = pendingWriter;
+    }
 
 
 	public void setPreviouslyImportedIssueMappings(Map<String, Integer> issueMappings) {
@@ -69,6 +71,12 @@ public class MigrationContext {
 				backportIssueHolderCount++;
 				return;
 			}
+
+			if ("pending".equals(imported.getImportResponse().getStatus())) {
+				writeLine(pendingWriter, jiraIssue.getKey() + ":" + imported.getIssueNumber() + "\n");
+				return;
+			}
+
 			issueMappings.put(jiraIssue.getKey(), imported.getIssueNumber());
 			writeLine(mappingsWriter, jiraIssue.getKey() + ":" + imported.getIssueNumber() + "\n");
 		}

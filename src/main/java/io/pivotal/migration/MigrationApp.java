@@ -70,9 +70,11 @@ public class MigrationApp implements CommandLineRunner {
 	public void run(String... strings) throws Exception {
 
 		File mappingsFile = new File("github-issue-mappings.properties");
+		File pendingFile = new File("github-issue-pending.properties");
 		File failuresFile = new File("github-migration-failures.txt");
 
 		try (FileWriter mappingsWriter = new FileWriter(mappingsFile, true);
+			 FileWriter pendingWriter = new FileWriter(pendingFile, true);
 			 FileWriter failuresWriter = new FileWriter(failuresFile, true)) {
 
 			String startTime = DateTimeFormat.forStyle("ML").print(DateTime.now());
@@ -80,7 +82,7 @@ public class MigrationApp implements CommandLineRunner {
 			failuresWriter.flush();
 
 			Map<String, Integer> issueMappings = loadIssueMappings(mappingsFile);
-			MigrationContext context = new MigrationContext(mappingsWriter, failuresWriter);
+			MigrationContext context = new MigrationContext(mappingsWriter, failuresWriter, pendingWriter);
 			context.setPreviouslyImportedIssueMappings(issueMappings);
 
 			try {
