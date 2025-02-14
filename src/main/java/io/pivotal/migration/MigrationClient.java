@@ -220,7 +220,7 @@ public class  MigrationClient {
 	}
 
 	private MilestoneFilter findExistingMilestones() {
-		BodyBuilder requestBuilder = getRepositoryRequestBuilder(HttpMethod.GET, "/milestones");
+		BodyBuilder requestBuilder = getRepositoryRequestBuilder(HttpMethod.GET, "/milestones?state=all");
 		List<String> existingMilestones =this.getRest().exchange(requestBuilder.build(), LIST_OF_MAPS_TYPE)
 				.getBody().stream()
 							.map(milestone -> (String) milestone.get("title"))
