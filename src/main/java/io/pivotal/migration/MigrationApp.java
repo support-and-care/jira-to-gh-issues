@@ -74,7 +74,7 @@ public class MigrationApp implements CommandLineRunner {
 		File failuresFile = new File("github-migration-failures.txt");
 
 		try (FileWriter mappingsWriter = new FileWriter(mappingsFile, true);
-			 FileWriter pendingWriter = new FileWriter(pendingFile, true);
+			 FileWriter pendingWriter = new FileWriter(pendingFile, false);
 			 FileWriter failuresWriter = new FileWriter(failuresFile, true)) {
 
 			String startTime = DateTimeFormat.forStyle("ML").print(DateTime.now());
@@ -82,15 +82,17 @@ public class MigrationApp implements CommandLineRunner {
 			failuresWriter.flush();
 
 			Map<String, Integer> issueMappings = loadIssueMappings(mappingsFile);
+			Map<String, Integer> issuesPendingMapping = loadIssueMappings(pendingFile);
 			MigrationContext context = new MigrationContext(mappingsWriter, failuresWriter, pendingWriter);
 			context.setPreviouslyImportedIssueMappings(issueMappings);
+			context.setPreviouslyPendingIssuesMapping(issuesPendingMapping);
 
 			try {
 				// Delete if github.delete-create-repository-slug=true AND 0 commits
 				if (github.deleteRepository()) {
-					Assert.isTrue(issueMappings.isEmpty(),
-							"Repository was deleted but github-issue-mappings.properties has content." +
-									"Please delete the file, or save the content elsewhere and then delete.");
+					Assert.isTrue(issueMappings.isEmpty() || issuesPendingMapping.isEmpty(),
+							"Repository was deleted but github-issue-mappings.properties or github-issue-pending.properties have content." +
+									"Please delete the files, or save the content elsewhere and then delete.");
 				}
 			}
 			catch (HttpClientErrorException ex) {
@@ -101,7 +103,7 @@ public class MigrationApp implements CommandLineRunner {
 
 			github.createRepository();
 
-			if (issueMappings.isEmpty()) {
+			if (issueMappings.isEmpty() || issuesPendingMapping.isEmpty()) {
 				JiraProject project = jira.findProject(jiraConfig.getProjectId());
 				github.createMilestones(project.getVersions());
 				github.createLabelsIfNotExist();
@@ -123,6 +125,11 @@ public class MigrationApp implements CommandLineRunner {
 					.collect(Collectors.toList());
 
 			github.createIssues(publicIssues, restrictedIssueKeys, context);
+			List<JiraIssue> pendingJiraIssues = jira.findIssuesVotesAndCommits(migrateJql, context::filterPendingIssuesForPRLinking);
+			if(!pendingJiraIssues.isEmpty()) {
+				logger.info("Found pending issues from previous migration run.");
+				github.linkPullRequestOfPendingIssues(pendingJiraIssues, context);
+			}
 
 			logger.info("Migration run completed: " + context);
 		}

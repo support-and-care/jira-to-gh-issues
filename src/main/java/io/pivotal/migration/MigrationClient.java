@@ -62,9 +62,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.RequestEntity.BodyBuilder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
@@ -323,7 +325,7 @@ public class  MigrationClient {
 		if(!config.isDeleteCreateRepositorySlug()) {
 			// Because linking pull request triggers events and it should not run at testing.
 			logger.info("Linking pull requests");
-			importedIssues.forEach(issue -> executeLinkPullRequest(issue, context));
+			importedIssues.forEach(issue -> executeLinkPullRequestForImportedIssue(issue, context));
 		}
 
 		logger.info("{} backport issue holders to create", backportMap.size());
@@ -359,10 +361,16 @@ public class  MigrationClient {
 		}
 	}
 
-	private void executeLinkPullRequest(ImportedIssue importedIssue, MigrationContext context) {
+	private void executeLinkPullRequestForImportedIssue(ImportedIssue importedIssue, MigrationContext context) {
 		int issueNumber = importedIssue.getIssueNumber();
+		String issueTitle = importedIssue.getImportResponse().getImportIssue().getIssue().getTitle();
 		List<GithubPullRequest> relatedPullRequests = importedIssue.getImportResponse().getImportIssue().getPullRequest();
 
+		executeLinkPullRequest(issueNumber, issueTitle, relatedPullRequests, context);
+
+	}
+
+	private void executeLinkPullRequest(int issueNumber, String issueTitle, List<GithubPullRequest> relatedPullRequests, MigrationContext context) {
 		relatedPullRequests.forEach(pullRequest -> {
 
 			Throwable failure = null;
@@ -376,12 +384,16 @@ public class  MigrationClient {
 				failure = ex;
 			}
 			if (failure != null) {
-				String message = "Failed to POST link pull request for \"" + importedIssue.getImportResponse().getImportIssue().getIssue().getTitle() + "\"";
+				String message = "Failed to POST link pull request for \"" + issueTitle + "\"";
 				logger.error(message, failure.getMessage());
 				context.addFailureMessage(message + ": " + failure.getMessage());
 			}
         });
+	}
 
+	private void executeLinkPullRequestForPrevioulyPendingIssues(JiraIssue jiraIssue, Integer gitHubIssueId, MigrationContext context) {
+		List<GithubPullRequest> pullRequests = initPullRequest(jiraIssue);
+		executeLinkPullRequest(gitHubIssueId, jiraIssue.getFields().getSummary(), pullRequests, context);
 	}
 
 	private BodyBuilder pullRequestRequestBuilder(int number) {
@@ -769,6 +781,28 @@ public class  MigrationClient {
 		body = engine.convert(body);  // escape annotations (colliding with GitHub mentions)
 		ghIssue.setBody(body);
 		return ghIssue;
+	}
+
+	public void linkPullRequestOfPendingIssues(List<JiraIssue> pendingJiraIssues, MigrationContext context) {
+		logger.info("Check status of pending issues fromm previous run.");
+		for (JiraIssue jiraIssue : pendingJiraIssues) {
+			Integer gitHubIssueId = context.getPendingGitHubIssueId(jiraIssue.getKey());
+            if (checkIfGithubIssueExists(gitHubIssueId)) {
+				logger.info("Linking pull request of GitHub issue " + gitHubIssueId);
+				executeLinkPullRequestForPrevioulyPendingIssues(jiraIssue, gitHubIssueId, context);
+			} else {
+				logger.warn("GitHub issue " + gitHubIssueId + " is still pending" );
+				context.addPendingMessage(jiraIssue.getKey() + ":" + gitHubIssueId);
+			}
+
+		}
+	}
+
+	
+	private boolean checkIfGithubIssueExists(int gitHubIssueId) {
+		BodyBuilder requestBuilder = getRepositoryRequestBuilder(HttpMethod.GET, "/issues/" + gitHubIssueId);
+		ResponseEntity<Map<String, Object>> response = getRest().exchange(requestBuilder.build(), MAP_TYPE);
+		return response.getStatusCode().equals(HttpStatus.OK);
 	}
 
 

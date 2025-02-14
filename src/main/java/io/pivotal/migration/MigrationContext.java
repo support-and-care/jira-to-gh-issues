@@ -40,6 +40,7 @@ public class MigrationContext {
     private final Writer pendingWriter;
 
     private final Map<String, Integer> issueMappings = new HashMap<>();
+	private final Map<String, Integer> issuesPendingMapping = new HashMap<>();
 
 	private int failedImportCount;
 
@@ -58,9 +59,20 @@ public class MigrationContext {
 		this.issueMappings.putAll(issueMappings);
 	}
 
+	public void setPreviouslyPendingIssuesMapping(Map<String, Integer> issuesPendingMapping) {
+		this.issuesPendingMapping.clear();
+		this.issuesPendingMapping.putAll(issuesPendingMapping);
+	}
+
 	public List<JiraIssue> filterRemaingIssuesToImport(List<JiraIssue> issues) {
 		return issues.stream()
-				.filter(issue -> !issueMappings.containsKey(issue.getKey()))
+				.filter(issue -> !issueMappings.containsKey(issue.getKey()) || !issuesPendingMapping.containsKey(issue.getKey()))
+				.collect(Collectors.toList());
+	}
+
+	public List<JiraIssue> filterPendingIssuesForPRLinking(List<JiraIssue> issues) {
+		return issues.stream()
+				.filter(issue -> issuesPendingMapping.containsKey(issue.getKey()))
 				.collect(Collectors.toList());
 	}
 
@@ -91,6 +103,10 @@ public class MigrationContext {
 		writeLine(failuresWriter, message + "\n");
 	}
 
+	public void addPendingMessage(String message) {
+		writeLine(pendingWriter, message + "\n");
+	}
+
 	private void writeLine(Writer writer, String line) {
 		try {
 			writer.write(line);
@@ -109,9 +125,14 @@ public class MigrationContext {
 		return issueMappings.get(jiraIssueKey);
 	}
 
+	public Integer getPendingGitHubIssueId(String jiraIssueKey) {
+		return issuesPendingMapping.get(jiraIssueKey);
+	}
+
 	@Override
 	public String toString() {
 		return this.issueMappings.size() + " imported issues, " +
+				this.issuesPendingMapping.size() + " pending issues, " +
 				this.failedImportCount + " failed imports, " + backportIssueHolderCount + " backported issue holders";
 	}
 
