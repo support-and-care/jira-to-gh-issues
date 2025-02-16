@@ -784,12 +784,13 @@ public class  MigrationClient {
 	}
 
 	public void linkPullRequestOfPendingIssues(List<JiraIssue> pendingJiraIssues, MigrationContext context) {
-		logger.info("Check status of pending issues fromm previous run.");
+		logger.info("Check status of pending issues from previous run.");
 		for (JiraIssue jiraIssue : pendingJiraIssues) {
 			Integer gitHubIssueId = context.getPendingGitHubIssueId(jiraIssue.getKey());
             if (checkIfGithubIssueExists(gitHubIssueId)) {
 				logger.info("Linking pull request of GitHub issue " + gitHubIssueId);
 				executeLinkPullRequestForPrevioulyPendingIssues(jiraIssue, gitHubIssueId, context);
+				context.logPendedIssueAsImport(jiraIssue.getKey());
 			} else {
 				logger.warn("GitHub issue " + gitHubIssueId + " is still pending" );
 				context.addPendingMessage(jiraIssue.getKey() + ":" + gitHubIssueId);

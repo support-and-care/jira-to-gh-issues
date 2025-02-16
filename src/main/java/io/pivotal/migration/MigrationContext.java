@@ -66,7 +66,7 @@ public class MigrationContext {
 
 	public List<JiraIssue> filterRemaingIssuesToImport(List<JiraIssue> issues) {
 		return issues.stream()
-				.filter(issue -> !issueMappings.containsKey(issue.getKey()) || !issuesPendingMapping.containsKey(issue.getKey()))
+				.filter(issue -> !(issueMappings.containsKey(issue.getKey()) || issuesPendingMapping.containsKey(issue.getKey())))
 				.collect(Collectors.toList());
 	}
 
@@ -97,6 +97,12 @@ public class MigrationContext {
 			String ref = jiraIssue != null ? jiraIssue.getKey() : imported.getMilestone().get("title") + " backports";
 			writeLine(failuresWriter, "=> " + ref + " [" + imported.getFailure() + "]\n");
 		}
+	}
+
+	public void logPendedIssueAsImport(String jiraIssueKey) {
+		Integer githubIssueNumber = issuesPendingMapping.remove(jiraIssueKey);
+		issueMappings.put(jiraIssueKey, githubIssueNumber);
+		writeLine(mappingsWriter, jiraIssueKey + ":" + githubIssueNumber + "\n");
 	}
 
 	public void addFailureMessage(String message) {

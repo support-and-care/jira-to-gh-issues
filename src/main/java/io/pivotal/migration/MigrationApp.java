@@ -74,7 +74,7 @@ public class MigrationApp implements CommandLineRunner {
 		File failuresFile = new File("github-migration-failures.txt");
 
 		try (FileWriter mappingsWriter = new FileWriter(mappingsFile, true);
-			 FileWriter pendingWriter = new FileWriter(pendingFile, false);
+			 FileWriter pendingWriter = new FileWriter(pendingFile, true);
 			 FileWriter failuresWriter = new FileWriter(failuresFile, true)) {
 
 			String startTime = DateTimeFormat.forStyle("ML").print(DateTime.now());
@@ -83,6 +83,8 @@ public class MigrationApp implements CommandLineRunner {
 
 			Map<String, Integer> issueMappings = loadIssueMappings(mappingsFile);
 			Map<String, Integer> issuesPendingMapping = loadIssueMappings(pendingFile);
+			pendingFile.delete();
+			pendingFile.createNewFile();
 			MigrationContext context = new MigrationContext(mappingsWriter, failuresWriter, pendingWriter);
 			context.setPreviouslyImportedIssueMappings(issueMappings);
 			context.setPreviouslyPendingIssuesMapping(issuesPendingMapping);
@@ -90,7 +92,7 @@ public class MigrationApp implements CommandLineRunner {
 			try {
 				// Delete if github.delete-create-repository-slug=true AND 0 commits
 				if (github.deleteRepository()) {
-					Assert.isTrue(issueMappings.isEmpty() || issuesPendingMapping.isEmpty(),
+					Assert.isTrue(issueMappings.isEmpty() && issuesPendingMapping.isEmpty(),
 							"Repository was deleted but github-issue-mappings.properties or github-issue-pending.properties have content." +
 									"Please delete the files, or save the content elsewhere and then delete.");
 				}
@@ -103,7 +105,7 @@ public class MigrationApp implements CommandLineRunner {
 
 			github.createRepository();
 
-			if (issueMappings.isEmpty() || issuesPendingMapping.isEmpty()) {
+			if (issueMappings.isEmpty() && issuesPendingMapping.isEmpty()) {
 				JiraProject project = jira.findProject(jiraConfig.getProjectId());
 				github.createMilestones(project.getVersions());
 				github.createLabelsIfNotExist();
