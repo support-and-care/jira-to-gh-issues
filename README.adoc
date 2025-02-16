@@ -22,6 +22,7 @@ repository in a user space
 * Add a `JiraIssueFilter` that allows to set filter rules which Jira issues should be migrated. This feature is needed, if you want to split a Jira project to several repositories
 * Jire Remote Links are supported. They are added as text into the issue body (similar to Jira Links).
 * Add Label mapping for Jira field `priority`
+* Pending issues are collected in a separate properties file, so that PR mapping can be done in a second run.
 
 Sample `application.properties` is prepared for Maven Clean Plugin and for the Maven Shared Component Jira project (Component `maven-verifier`).
 
@@ -137,3 +138,8 @@ The migration tool creates as one of the first steps GitHub milestones based on 
 	}
 
 ----
+
+### Manual clean up of migrated issues
+
+If you want to delete migrated issues, you should be careful that the GitHub REST API `issues` also get pull requests.
+Therefore, you should filter the issues also by author.
