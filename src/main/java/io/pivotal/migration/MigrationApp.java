@@ -127,9 +127,9 @@ public class MigrationApp implements CommandLineRunner {
 					.collect(Collectors.toList());
 
 			github.createIssues(publicIssues, restrictedIssueKeys, context);
-			List<JiraIssue> pendingJiraIssues = jira.findIssuesVotesAndCommits(migrateJql, context::filterPendingIssuesForPRLinking);
+			List<JiraIssue> pendingJiraIssues = jira.findIssues(migrateJql).stream().filter(context.filterPendingIssuesForPRLinking()).toList();
 			if(!pendingJiraIssues.isEmpty()) {
-				logger.info("Found pending issues from previous migration run.");
+				logger.info("Found pending issues...");
 				github.linkPullRequestOfPendingIssues(pendingJiraIssues, context);
 			}
 

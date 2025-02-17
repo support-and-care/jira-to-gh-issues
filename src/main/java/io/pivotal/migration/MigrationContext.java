@@ -20,6 +20,7 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import io.pivotal.jira.JiraIssue;
@@ -70,11 +71,9 @@ public class MigrationContext {
 				.collect(Collectors.toList());
 	}
 
-	public List<JiraIssue> filterPendingIssuesForPRLinking(List<JiraIssue> issues) {
-		return issues.stream()
-				.filter(issue -> issuesPendingMapping.containsKey(issue.getKey()))
-				.collect(Collectors.toList());
-	}
+	public Predicate<JiraIssue> filterPendingIssuesForPRLinking() {
+		return jiraIssue -> issuesPendingMapping.containsKey(jiraIssue.getKey());
+    }
 
 	public void addImportResult(MigrationClient.ImportedIssue imported) {
 		JiraIssue jiraIssue = imported.getJiraIssue();
@@ -85,6 +84,7 @@ public class MigrationContext {
 			}
 
 			if ("pending".equals(imported.getImportResponse().getStatus())) {
+				issuesPendingMapping.put(jiraIssue.getKey(), imported.getIssueNumber());
 				writeLine(pendingWriter, jiraIssue.getKey() + ":" + imported.getIssueNumber() + "\n");
 				return;
 			}
