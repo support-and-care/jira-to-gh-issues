@@ -99,6 +99,7 @@ public class AssigneesReport extends BaseApp {
 		List<JiraUserData> assignees = result.entrySet().stream()
 			.filter(entry -> !knownUsers.contains(entry.getKey().value))
 			.map(Entry::getValue)
+			.sorted((a, b) -> b.asigneeCount().get() - a.asigneeCount().get())
 			.toList();
 
 		for (JiraUserData assignee : assignees) {
