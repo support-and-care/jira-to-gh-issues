@@ -15,16 +15,18 @@
  */
 package io.pivotal.pre;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
 import io.pivotal.jira.JiraClient;
 import io.pivotal.jira.JiraConfig;
 import io.pivotal.jira.JiraIssue;
 import io.pivotal.jira.JiraUser;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -36,25 +38,73 @@ import io.pivotal.jira.JiraUser;
 public class AssigneesReport extends BaseApp {
 
 
-	public static void main(String args[]) {
+	public static void main(String[] args) {
+
+		record JiraUserName(String value) {}
+
+		record JiraUserData(JiraUserName jiraUserName, String displayName, AtomicInteger asigneeCount) {
+			static JiraUserData create(JiraUserName userName, String displayName) {
+				return new JiraUserData(userName, displayName, new AtomicInteger(0));
+			}
+
+			@Override
+			public String toString() {
+				return jiraUserName().value + " (" + displayName() + ") [" + asigneeCount() + "]";
+			}
+		}
 
 		JiraConfig config = initJiraConfig();
 		JiraClient client = new JiraClient(config);
 
-		Map<String, AtomicInteger> result = new HashMap<>();
+		Map<JiraUserName, JiraUserData> result = new HashMap<>();
 		for (JiraIssue issue : client.findIssues(config.getMigrateJql())) {
 			JiraUser user = issue.getFields().getAssignee();
 			if (user != null) {
-				String key = user.getKey() + " (" + user.getDisplayName() + ")";
-				result.computeIfAbsent(key, s -> new AtomicInteger(0)).getAndIncrement();
+				JiraUserName asignee = new JiraUserName(user.getKey());
+
+				result.computeIfPresent(asignee, (key, data) -> {
+					data.asigneeCount().incrementAndGet();
+					return data;
+				});
+
+				result.computeIfAbsent(asignee, (userName) -> JiraUserData.create(userName, user.getDisplayName()));
 			}
 		}
 
-		List<String> assignees = result.entrySet().stream()
-				.map(entry -> entry.getKey() + " [" + entry.getValue().get() + "]")
-				.collect(Collectors.toList());
+		List<String> knownUsers = new ArrayList<>();
 
-		System.out.println("Assignees: \n" + assignees + "\n\n");
+		try {
+			var lines = Files.readAllLines(Path.of("./jira-to-github-users.properties"));
+			for (String line : lines) {
+				if (line.startsWith("#") || line.isBlank()) {
+					continue;
+				}
+
+				String[] parts = line.split(":");
+
+				if (parts.length < 2) {
+					System.out.println("Invalid line: " + line);
+					continue;
+				}
+
+				String jiraUser = parts[0];
+				String githubUser = parts[1];
+				knownUsers.add(jiraUser);
+			}
+		} catch (Exception e) {
+			System.out.println("File not found. Wont apply filtering.");
+			e.printStackTrace();
+		}
+
+		List<JiraUserData> assignees = result.entrySet().stream()
+			.filter(entry -> !knownUsers.contains(entry.getKey().value))
+			.map(Entry::getValue)
+			.sorted((a, b) -> b.asigneeCount().get() - a.asigneeCount().get())
+			.toList();
+
+		for (JiraUserData assignee : assignees) {
+			System.out.println(assignee);
+		}
 	}
 
 }
