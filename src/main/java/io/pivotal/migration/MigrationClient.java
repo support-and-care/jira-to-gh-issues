@@ -404,8 +404,8 @@ public class  MigrationClient {
 
 	private List<GithubPullRequest> initPullRequest(JiraIssue jiraIssue) {
 		return jiraIssue.getFields().getRemoteLinks().stream()
-				.filter(remoteLink -> remoteLink.getTitle()
-				.contains("GitHub Pull Request"))
+				.filter(remoteLink -> remoteLink.getUrl()
+				.contains("pull"))
 				.map(remoteLink -> {
 					logger.debug("For JiraIssue {}, PullRequest {} found", jiraIssue.getKey(), remoteLink.getTitle());
 					String[] splittedUrl = remoteLink.getUrl().split("/");
