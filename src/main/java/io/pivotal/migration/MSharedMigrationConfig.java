@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ import java.util.List;
  * Configuration for migration of MSHARED Jira.
  */
 @Configuration
+@Import(CommonApacheMavenMigrationConfig.class)
 @ConditionalOnProperty(name = "jira.projectId", havingValue = "MSHARED")
 public class MSharedMigrationConfig {
 
@@ -37,52 +39,6 @@ public class MSharedMigrationConfig {
 	@Bean
 	public MilestoneFilter milestoneFilter(@Value("${jira.component}") String componentName) {
 		return fixVersion -> fixVersion.getName().startsWith(componentName);
-	}
-
-	@Bean
-	public LabelHandler labelHandler() {
-		FieldValueLabelHandler fieldValueHandler = new FieldValueLabelHandler();
-		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "Bug", "bug");
-		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "Improvement", "enhancement");
-		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "New Feature", "enhancement");
-		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "Task", "maintenance");
-		fieldValueHandler.addMapping(FieldValueLabelHandler.FieldType.ISSUE_TYPE, "Dependency Upgrade", "dependencies");
-
-		CompositeLabelHandler handler = new CompositeLabelHandler();
-		handler.addLabelHandler(fieldValueHandler);
-
-
-		return handler;
-	}
-
-	@Bean
-	public IssueProcessor issueProcessor() {
-		return new CompositeIssueProcessor(new FixDependencyIssueProcessor(), new SkipBotCommentIssueProcessor());
-	}
-
-
-	private static class FixDependencyIssueProcessor implements IssueProcessor {
-
-		@Override
-		public void beforeImport(JiraIssue jiraIssue, ImportGithubIssue githubIssue) {
-			if (jiraIssue.getFields().getIssuetype().getName().equals("Task") ||
-			jiraIssue.getFields().getIssuetype().getName().equals("Improvement")) {
-				if(jiraIssue.getFields().getSummary().contains("Bump") || jiraIssue.getFields().getSummary().contains("Upgrade")) {
-					githubIssue.getIssue().setLabels(List.of("dependencies"));
-				}
-
-			}
-		}
-	}
-
-	private static class SkipBotCommentIssueProcessor implements IssueProcessor {
-		@Override
-		public void beforeImport(JiraIssue jiraIssue, ImportGithubIssue importIssue) {
-			List<GithubComment> filteredCommentList = importIssue.getComments().stream()
-					.filter(githubComment -> !(githubComment.getBody().contains("https://issues.apache.org/secure/ViewProfile.jspa?name=hudson") || githubComment.getBody().contains("https://issues.apache.org/secure/ViewProfile.jspa?name=githubbot")))
-					.toList();
-			importIssue.setComments(filteredCommentList);
-		}
 	}
 
 	@Bean
