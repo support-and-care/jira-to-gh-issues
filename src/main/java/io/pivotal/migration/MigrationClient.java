@@ -200,7 +200,7 @@ public class  MigrationClient {
 		getRest().exchange(requestEntity, MAP_TYPE);
 	}
 
-	public void createMilestones(List<JiraVersion> versions) {
+	public void createMilestonesIfNotExists(List<JiraVersion> versions) {
 		BodyBuilder requestBuilder = getRepositoryRequestBuilder(HttpMethod.POST, "/milestones");
 		MilestoneFilter alreadyExistingMilestonesFilter = findExistingMilestones();
 		versions = versions.stream().filter(milestoneFilter)
@@ -245,7 +245,7 @@ public class  MigrationClient {
 		RequestEntity<Void> requestEntity = getRepositoryRequestBuilder(HttpMethod.GET, "/labels").build();
 		List<Map<String, Object>> exitingsLabels = getRest().exchange(requestEntity, LIST_OF_MAPS_TYPE).getBody();
 		List<String> existingLabelNames = exitingsLabels.stream().map(labelObject -> (String) labelObject.get("name")).toList();
-		logger.info("Existing labels: {}", exitingsLabels);
+		logger.info("Existing labels: {}", existingLabelNames);
 		return existingLabelNames;
 	}
 
@@ -404,8 +404,8 @@ public class  MigrationClient {
 
 	private List<GithubPullRequest> initPullRequest(JiraIssue jiraIssue) {
 		return jiraIssue.getFields().getRemoteLinks().stream()
-				.filter(remoteLink -> remoteLink.getUrl()
-				.contains("pull"))
+				.filter(remoteLink -> remoteLink.getUrl().contains("pull"))
+				.filter(remoteLink -> isNumeric(remoteLink.getUrl().split("/")))
 				.map(remoteLink -> {
 					logger.debug("For JiraIssue {}, PullRequest {} found", jiraIssue.getKey(), remoteLink.getTitle());
 					String[] splittedUrl = remoteLink.getUrl().split("/");
@@ -413,6 +413,15 @@ public class  MigrationClient {
 				}).toList();
 
 
+	}
+
+	private static boolean isNumeric(String[] splittedURL) {
+		try {
+			Integer.parseInt(splittedURL[splittedURL.length - 1]);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 
 	private Map<String, JiraUser> collectUsers(List<JiraIssue> issues) {

@@ -107,7 +107,7 @@ public class MigrationApp implements CommandLineRunner {
 
 			if (issueMappings.isEmpty() && issuesPendingMapping.isEmpty()) {
 				JiraProject project = jira.findProject(jiraConfig.getProjectId());
-				github.createMilestones(project.getVersions());
+				github.createMilestonesIfNotExists(project.getVersions());
 				github.createLabelsIfNotExist();
 			}
 			else {

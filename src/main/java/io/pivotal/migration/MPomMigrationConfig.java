@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Primary;
 
 
 /**
- * Configuration for migration of Apache Maven Jira Project MMETRIC.
+ * Configuration for migration of Apache Maven Jira Project MPom.
  */
 @Configuration
 @ConditionalOnProperty(name = "jira.projectId", havingValue = "MPOM")
@@ -35,7 +35,11 @@ public class MPomMigrationConfig {
     @Primary
     @Bean
     public MilestoneFilter milestoneFilter(@Value("${jira.component}") String componentName) {
-        return fixVersion -> fixVersion.getName().startsWith(componentName);
+        return fixVersion -> {
+            String versionName = fixVersion.getName();
+            String[] splittedName = versionName.split("-");
+            return splittedName.length == 2 && versionName.startsWith(componentName.toUpperCase());
+        };
     }
 
     @Primary
