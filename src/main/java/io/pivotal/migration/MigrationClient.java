@@ -88,6 +88,7 @@ public class  MigrationClient {
 	private static final Logger logger = LogManager.getLogger(MigrationClient.class);
 
 	private static final List<String> SUPPRESSED_LINK_TYPES = Arrays.asList("relates to", "is related to");
+	private static final List<String> RESOLUTION_TYPES_FOR_NOT_PLANNED_MAPPING = Arrays.asList("Won't Fix",  "Won't Do", "Abandoned", "Not A Bug", "Not A Problem");
 
 	private static final ParameterizedTypeReference<Map<String, Object>> MAP_TYPE =
 			new ParameterizedTypeReference<Map<String, Object>>() {};
@@ -745,6 +746,13 @@ public class  MigrationClient {
 					importedIssue.setFailure("No URL for imported issue: " + body);
 					return false;
 				}
+				var jiraResolution = jiraIssue != null ? jiraIssue.getFields().getResolution() : null;
+				if (jiraResolution != null && RESOLUTION_TYPES_FOR_NOT_PLANNED_MAPPING.contains(jiraResolution.getName())) {
+					boolean success = updateStateReasonToNotPlanned(jiraIssue, url);
+					if (!success) {
+						return false;
+					}
+				}
 				UriComponents parts = UriComponentsBuilder.fromUriString(url).build();
 				List<String> segments = parts.getPathSegments();
 				int issueNumber = Integer.parseInt(segments.get(segments.size() - 1));
@@ -755,6 +763,29 @@ public class  MigrationClient {
 		finally {
 			context.addImportResult(importedIssue);
 		}
+	}
+
+	private boolean updateStateReasonToNotPlanned(JiraIssue jiraIssue, String url) {
+		RequestEntity<String> request = RequestEntity.patch(url)
+				.accept(new MediaType("application", "vnd.github.golden-comet-preview+json"))
+				.header("Authorization", "token " + this.config.getAccessToken())
+				.body("{\n" +
+						"  \"state\": \"closed\", \n" +
+						"  \"state_reason\": \"not_planned\"\n" +
+						"}");
+        try {
+            ResponseEntity<String> responseEntity = getRest().exchange(request, String.class);
+			if (responseEntity.getStatusCode().is2xxSuccessful()) {
+				logger.info("Update state reason in GitHub for Jira issue [" + jiraIssue.getKey() + "] to not_planned");
+				return true;
+			} else {
+				logger.error("Update state reason failed for Jira issue [: " + jiraIssue.getKey(), "], status code: " + responseEntity.getStatusCode());
+				return false;
+			}
+        } catch (RestClientException ex) {
+			logger.error("Update state reason failed for Jira issue [: " + jiraIssue.getKey() + "]", ex);
+			return false;
+        }
 	}
 
 	private GithubIssue initMilestoneBackportIssue(

@@ -1,0 +1,22 @@
+meta {
+  name: Update Issue
+  type: http
+  seq: 7
+}
+
+patch {
+  url: https://api.github.com/repos/support-and-care/jira-to-gh-issue-dummy-repo-test/issues/1
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: ****
+}
+
+body:json {
+  {
+    "state": "closed", 
+    "state_reason": "not_planned"
+  }
+}
