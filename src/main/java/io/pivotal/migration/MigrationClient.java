@@ -748,9 +748,9 @@ public class  MigrationClient {
 				}
 				var jiraResolution = jiraIssue != null ? jiraIssue.getFields().getResolution() : null;
 				if (jiraResolution != null && RESOLUTION_TYPES_FOR_NOT_PLANNED_MAPPING.contains(jiraResolution.getName())) {
-					boolean success = updateStateReasonToNotPlanned(jiraIssue, url);
-					if (!success) {
-						return false;
+					boolean stateWasUpdated = updateStateReasonToNotPlanned(jiraIssue, url);
+					if (!stateWasUpdated) {
+						logger.warn("Closed reason update failed for Jira issue " + jiraIssue.getKey());
 					}
 				}
 				UriComponents parts = UriComponentsBuilder.fromUriString(url).build();
@@ -773,8 +773,8 @@ public class  MigrationClient {
 						"  \"state\": \"closed\", \n" +
 						"  \"state_reason\": \"not_planned\"\n" +
 						"}");
-        try {
-            ResponseEntity<String> responseEntity = getRest().exchange(request, String.class);
+		try {
+			ResponseEntity<String> responseEntity = getRest().exchange(request, String.class);
 			if (responseEntity.getStatusCode().is2xxSuccessful()) {
 				logger.info("Update state reason in GitHub for Jira issue [" + jiraIssue.getKey() + "] to not_planned");
 				return true;
@@ -782,10 +782,10 @@ public class  MigrationClient {
 				logger.error("Update state reason failed for Jira issue [: " + jiraIssue.getKey(), "], status code: " + responseEntity.getStatusCode());
 				return false;
 			}
-        } catch (RestClientException ex) {
+		} catch (RestClientException ex) {
 			logger.error("Update state reason failed for Jira issue [: " + jiraIssue.getKey() + "]", ex);
 			return false;
-        }
+		}
 	}
 
 	private GithubIssue initMilestoneBackportIssue(
