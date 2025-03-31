@@ -769,10 +769,11 @@ public class  MigrationClient {
 		RequestEntity<String> request = RequestEntity.patch(url)
 				.accept(new MediaType("application", "vnd.github.golden-comet-preview+json"))
 				.header("Authorization", "token " + this.config.getAccessToken())
-				.body("{\n" +
-						"  \"state\": \"closed\", \n" +
-						"  \"state_reason\": \"not_planned\"\n" +
-						"}");
+				.body("""
+                        {
+                          "state": "closed",\s
+                          "state_reason": "not_planned"
+                        }""");
 		try {
 			ResponseEntity<String> responseEntity = getRest().exchange(request, String.class);
 			if (responseEntity.getStatusCode().is2xxSuccessful()) {
