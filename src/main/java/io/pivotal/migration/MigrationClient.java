@@ -824,13 +824,14 @@ public class  MigrationClient {
 		return ghIssue;
 	}
 
-	public void linkPullRequestOfPendingIssues(List<JiraIssue> pendingJiraIssues, MigrationContext context) {
+	public void updateLinkingPRAndClosedReason(List<JiraIssue> pendingJiraIssues, MigrationContext context) {
 		logger.info("Check status of pending issues from previous run.");
 		for (JiraIssue jiraIssue : pendingJiraIssues) {
 			Integer gitHubIssueId = context.getPendingGitHubIssueId(jiraIssue.getKey());
             if (checkIfGithubIssueExists(gitHubIssueId)) {
 				logger.info("Linking pull request of GitHub issue " + gitHubIssueId);
 				executeLinkPullRequestForPrevioulyPendingIssues(jiraIssue, gitHubIssueId, context);
+				checkAndUpdateClosedReason(jiraIssue, gitHubIssueId);
 				context.logPendedIssueAsImport(jiraIssue.getKey());
 			} else {
 				logger.warn("GitHub issue " + gitHubIssueId + " is still pending" );
@@ -840,7 +841,18 @@ public class  MigrationClient {
 		}
 	}
 
-	
+	private void checkAndUpdateClosedReason(JiraIssue jiraIssue, Integer gitHubIssueId) {
+		var jiraResolution = jiraIssue != null ? jiraIssue.getFields().getResolution() : null;
+		if(jiraResolution != null && RESOLUTION_TYPES_FOR_NOT_PLANNED_MAPPING.contains(jiraResolution.getName())) {
+			String url = GITHUB_URL + "/repos/" + this.config.getRepositorySlug() + "/issues/" + gitHubIssueId;
+			boolean closedReasonUpdated = updateStateReasonToNotPlanned(jiraIssue, url);
+			if (!closedReasonUpdated) {
+                logger.warn("Closed reason update failed for Jira issue " + jiraIssue.getKey());
+			}
+		}
+	}
+
+
 	private boolean checkIfGithubIssueExists(int gitHubIssueId) {
 		BodyBuilder requestBuilder = getRepositoryRequestBuilder(HttpMethod.GET, "/issues/" + gitHubIssueId);
 		ResponseEntity<Map<String, Object>> response = getRest().exchange(requestBuilder.build(), MAP_TYPE);
