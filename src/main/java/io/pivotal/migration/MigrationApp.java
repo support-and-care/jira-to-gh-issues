@@ -130,7 +130,7 @@ public class MigrationApp implements CommandLineRunner {
 			List<JiraIssue> pendingJiraIssues = jira.findIssues(migrateJql).stream().filter(context.filterPendingIssuesForPRLinking()).toList();
 			if(!pendingJiraIssues.isEmpty()) {
 				logger.info("Found pending issues...");
-				github.linkPullRequestOfPendingIssues(pendingJiraIssues, context);
+				github.updateLinkingPRAndClosedReason(pendingJiraIssues, context);
 			}
 
 			logger.info("Migration run completed: " + context);
