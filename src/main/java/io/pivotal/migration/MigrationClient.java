@@ -88,7 +88,7 @@ public class  MigrationClient {
 	private static final Logger logger = LogManager.getLogger(MigrationClient.class);
 
 	private static final List<String> SUPPRESSED_LINK_TYPES = Arrays.asList("relates to", "is related to");
-	private static final List<String> RESOLUTION_TYPES_FOR_NOT_PLANNED_MAPPING = Arrays.asList("Won't Fix",  "Won't Do", "Abandoned", "Not A Bug", "Not A Problem");
+	private static final List<String> RESOLUTION_TYPES_FOR_NOT_PLANNED_MAPPING = Arrays.asList("Won't Fix",  "Won't Do", "Abandoned", "Not A Bug", "Not A Problem", "Cannot Reproduce");
 
 	private static final ParameterizedTypeReference<Map<String, Object>> MAP_TYPE =
 			new ParameterizedTypeReference<Map<String, Object>>() {};
