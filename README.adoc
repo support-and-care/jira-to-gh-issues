@@ -143,3 +143,13 @@ The migration tool creates as one of the first steps GitHub milestones based on 
 
 If you want to delete migrated issues, you should be careful that the GitHub REST API `issues` also get pull requests.
 Therefore, you should filter the issues also by author.
+
+### What can I do if the Jira project has to many issues for one migration run?
+
+Using the GitHub API has two limitations.
+One limitation is the rate limits of the API and the validation time of the API token.
+When the Jira project has too many issues (more than 1000 issues), then you have to split the migration in several runs.
+Therefore, you can limit the number of issues for migration with the property `jira.migrate-jql` in `application.properties`.
+
+For example, you can set `jira.migrate-jql=project\=${jira.projectId} AND created < 2010-01-01 and created >=2007-01-01`, so that only issues are migrated that are created in this specific time slot.
+So if your Jira project has to many issues for one migration run, you make several migrations run with adjusted time slot for each run.
