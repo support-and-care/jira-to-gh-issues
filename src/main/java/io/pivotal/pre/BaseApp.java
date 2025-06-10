@@ -38,7 +38,8 @@ public class BaseApp {
 	static {
 		try {
 			props.putAll(PropertiesLoaderUtils.loadProperties(new ClassPathResource("application.properties")));
-//			props.putAll(PropertiesLoaderUtils.loadProperties(new ClassPathResource("application-local.properties")));
+			props.putAll(PropertiesLoaderUtils.loadProperties(new ClassPathResource("application-local.properties")));
+			props.putAll(System.getProperties());
 		}
 		catch (IOException ex) {
 			throw new IllegalArgumentException(ex);
