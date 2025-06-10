@@ -15,26 +15,17 @@
  */
 package io.pivotal.post;
 
-import io.pivotal.jira.JiraConfig;
-import io.pivotal.util.ProgressTracker;
 import org.springframework.http.RequestEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static org.hamcrest.text.IsEqualCompressingWhiteSpace.equalToCompressingWhiteSpace;
 
 /**
  * This app will scan issues of a Github repo to search the jira.projectId in issue title to find the jira id
@@ -56,7 +47,7 @@ public class JiraGithubMappingApp extends GitHubBaseApp {
 			mappingsFile = new File("github-issue-mappings.properties");
 		}
 
-		JiraConfig jiraConfig = new JiraConfig();
+		Files.deleteIfExists(mappingsFile.toPath());
 
 		List<String> mappings = new ArrayList<>();
 
@@ -89,7 +80,7 @@ public class JiraGithubMappingApp extends GitHubBaseApp {
 						logger.info("number/title: {}/{}", number, title);
 						if(title.contains("[" + projectId)){
 							String jiraKey = title.substring(title.lastIndexOf('[') + 1, title.indexOf(']'));
-							logger.info("ghId: {}/{}", number, jiraKey);
+							logger.info("mapping: {}/{}", number, jiraKey);
 							mappings.add(jiraKey + ":" + number);
 						}
 					}

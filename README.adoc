@@ -168,3 +168,16 @@ java -Djira.projectId=MJAVADOC -Dgithub.repository-slug=apache/maven-javadoc-plu
 
 The first argument `jiralink` will run the tool which add the links, the second optional argument is a path to the mapping file
 (default value `./github-issue-mappings.properties`)
+
+### Generate Jira issue GH issue mapping file
+If the repository has already been migrated and you don't have the mapping file, you can generate the file `github-issue-mappings.properties`
+with the following command
+```
+java -Djira.projectId=MCLEAN -Dgithub.repository-slug=apache/maven-clean-plugin -Dgithub.access-token=
+-jar target/jira-to-gh-issues-0.0.1-SNAPSHOT.jar
+jiraghmapping /home/olamy/dev/sources/open-elements/jira-to-gh-issues/github-issue-mappings.properties
+
+```
+
+The first argument `jiraghmapping` will run the tool which add the links, the second optional argument is a path to the mapping file
+(default value `./github-issue-mappings.properties`)
