@@ -153,3 +153,18 @@ Therefore, you can limit the number of issues for migration with the property `j
 
 For example, you can set `jira.migrate-jql=project\=${jira.projectId} AND created < 2010-01-01 and created >=2007-01-01`, so that only issues are migrated that are created in this specific time slot.
 So if your Jira project has to many issues for one migration run, you make several migrations run with adjusted time slot for each run.
+
+### Add comment with link to GH issue in the Jira
+
+Once the migration has been done, the current directory will have a new file `github-issue-mappings.properties` containing the mapping between
+the Jira issue and the created GH issue.
+You can run the tool to add a commnent with link to the GH issue for all Jira issues:
+```
+java -Djira.projectId=MJAVADOC -Dgithub.repository-slug=apache/maven-javadoc-plugin -Djira.user=xxx -Djira.password=xxx
+    -jar target/jira-to-gh-issues-0.0.1-SNAPSHOT.jar
+    jiralink
+    /home/ubuntu/dev/sources/open-elements/jira-to-gh-issues/github-issue-mappings.properties
+```
+
+The first argument `jiralink` will run the tool which add the links, the second optional argument is a path to the mapping file
+(default value `./github-issue-mappings.properties`)
