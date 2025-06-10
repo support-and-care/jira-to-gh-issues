@@ -81,6 +81,13 @@ public class GitHubBaseApp extends BaseApp {
 		return exchange(requestEntity, ParameterizedTypeReference.forType(responseType), writer, failed);
 	}
 
+	protected static RequestEntity<Void> issuesPageRequest(UriComponentsBuilder uricBuilder, int page) {
+		return RequestEntity.get(uricBuilder.build(String.valueOf(page)))
+				.accept(APPLICATION_GH_RAW_JSON)
+				.header("Authorization", "token " + accessToken)
+				.build();
+	}
+
 	protected static <T> T exchange(RequestEntity<?> requestEntity, ParameterizedTypeReference<T> responseType,
 			FileWriter writer, AtomicBoolean failed) {
 
