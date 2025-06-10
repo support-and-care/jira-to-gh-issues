@@ -51,7 +51,12 @@ public class LastJiraCommentApp extends BaseApp {
 		String repoSlug = props.getProperty("github.repository-slug");
 		String issueBaseUrl = "https://github.com/" + repoSlug + "/issues/";
 
-		File mappingsFile = new File("github-issue-mappings.properties");
+		File mappingsFile;
+		if(args !=null && args.length > 0) {
+			mappingsFile = new File(args[0]);
+		} else {
+			mappingsFile = new File("github-issue-mappings.properties");
+		}
 		Map<String, Integer> issueMappings = loadIssueMappings(mappingsFile);
 
 		List<JiraIssue> issues = client.findIssues(config.getMigrateJql())

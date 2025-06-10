@@ -29,6 +29,7 @@ import io.pivotal.jira.JiraClient;
 import io.pivotal.jira.JiraConfig;
 import io.pivotal.jira.JiraIssue;
 import io.pivotal.jira.JiraProject;
+import io.pivotal.post.LastJiraCommentApp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
@@ -61,13 +62,25 @@ public class MigrationApp implements CommandLineRunner {
 	JiraConfig jiraConfig;
 
 
-	public static void main(String args[]) {
-		SpringApplication.run(MigrationApp.class);
+	public static void main(String[] args) {
+		SpringApplication.run(MigrationApp.class, args);
 	}
 
 
 	@Override
 	public void run(String... strings) throws Exception {
+
+		if(strings != null && strings.length > 0) {
+			if("jiralink".equals(strings[0])){
+				if(strings.length > 1) {
+					// we have 2 parameters jiralink and path to mapping file
+					LastJiraCommentApp.main(new String[]{strings[1]});
+				} else {
+					LastJiraCommentApp.main(null);
+				}
+				System.exit(0);
+			}
+		}
 
 		File mappingsFile = new File("github-issue-mappings.properties");
 		File pendingFile = new File("github-issue-pending.properties");
