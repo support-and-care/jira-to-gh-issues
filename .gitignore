@@ -29,3 +29,4 @@ post-migration-conversion-failures.txt
 markup-before.txt
 markup-after.txt
 **/application.properties
+github-issue-mappings-failures.txt
