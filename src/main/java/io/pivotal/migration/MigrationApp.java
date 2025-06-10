@@ -29,6 +29,7 @@ import io.pivotal.jira.JiraClient;
 import io.pivotal.jira.JiraConfig;
 import io.pivotal.jira.JiraIssue;
 import io.pivotal.jira.JiraProject;
+import io.pivotal.post.JiraGithubMappingApp;
 import io.pivotal.post.LastJiraCommentApp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -77,6 +78,15 @@ public class MigrationApp implements CommandLineRunner {
 					LastJiraCommentApp.main(new String[]{strings[1]});
 				} else {
 					LastJiraCommentApp.main(null);
+				}
+				System.exit(0);
+			}
+			if("jiraghmapping".equals(strings[0])){
+				if(strings.length > 1) {
+					// we have 2 parameters and path to mapping file
+					JiraGithubMappingApp.main(new String[]{strings[1]});
+				} else {
+					JiraGithubMappingApp.main(null);
 				}
 				System.exit(0);
 			}

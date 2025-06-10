@@ -105,12 +105,7 @@ public class BulkIssueClosingApp extends GitHubBaseApp {
 		}
 	}
 
-	private static RequestEntity<Void> issuesPageRequest(UriComponentsBuilder uricBuilder, int page) {
-		return RequestEntity.get(uricBuilder.build(String.valueOf(page)))
-				.accept(APPLICATION_GH_RAW_JSON)
-				.header("Authorization", "token " + accessToken)
-				.build();
-	}
+
 
 	private static RequestEntity<Void> getCommentsRequest(Integer ghIssueId) {
 		return RequestEntity.get(commentsUricBuilder.expand(ghIssueId).toUri())
