@@ -79,7 +79,7 @@ public class JiraGithubMappingApp extends GitHubBaseApp {
 						Integer number = (Integer) map.get("number");
 						logger.info("number/title: {}/{}", number, title);
 						if(title.contains("[" + projectId)){
-							String jiraKey = title.substring(title.lastIndexOf('[') + 1, title.indexOf(']'));
+							String jiraKey = title.substring(title.indexOf('[') + 1, title.indexOf(']'));
 							logger.info("mapping: {}/{}", number, jiraKey);
 							mappings.add(jiraKey + ":" + number);
 						}
