@@ -5,7 +5,6 @@ import io.pivotal.github.ImportGithubIssue;
 import io.pivotal.jira.JiraIssue;
 import org.springframework.context.annotation.Bean;
 
-import javax.annotation.Priority;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
