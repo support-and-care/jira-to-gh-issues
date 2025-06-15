@@ -376,11 +376,15 @@ public class  MigrationClient {
 
 			Throwable failure = null;
             try {
-                BodyBuilder bodyBuilder = pullRequestRequestBuilder(pullRequest.getNumber());
-                GithubComment githubComment = new GithubComment();
-                githubComment.setBody("Resolve #" + issueNumber);
-                RequestEntity<GithubComment> request = bodyBuilder.body(githubComment);
-                getRest().exchange(request, String.class);
+				if(resolvedCommentAlreadyExists(pullRequest.getNumber())) {
+					logger.info("Resolve comment for pull request #" + pullRequest.getNumber() + " already exists");
+				} else {
+					BodyBuilder bodyBuilder = pullRequestRequestBuilder(pullRequest.getNumber());
+					GithubComment githubComment = new GithubComment();
+					githubComment.setBody("Resolve #" + issueNumber);
+					RequestEntity<GithubComment> request = bodyBuilder.body(githubComment);
+					getRest().exchange(request, String.class);
+				}
             } catch (Throwable ex) {
 				failure = ex;
 			}
@@ -390,6 +394,13 @@ public class  MigrationClient {
 				context.addFailureMessage(message + ": " + failure.getMessage());
 			}
         });
+	}
+
+	private boolean resolvedCommentAlreadyExists(int pullRequestNumber) {
+		String url = GITHUB_URL + "/repos/" + this.config.getRepositorySlug() + "/issues/" + pullRequestNumber + "/comments";
+		RequestEntity<Void> request = RequestEntity.method(HttpMethod.GET, URI.create(url)).build();
+		ResponseEntity<GithubComment[]> response = getRest().exchange(request, GithubComment[].class);
+		return Arrays.stream(response.getBody()).anyMatch(comment -> comment.getBody().contains("Resolve #"));
 	}
 
 	private void executeLinkPullRequestForPrevioulyPendingIssues(JiraIssue jiraIssue, Integer gitHubIssueId, MigrationContext context) {
