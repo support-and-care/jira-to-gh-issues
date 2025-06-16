@@ -283,6 +283,7 @@ public class  MigrationClient {
 		List<JiraIssue> importIssues = context.filterRemaingIssuesToImport(publicIssues).stream().filter(jiraIssue -> jiraIssueFilter.test(jiraIssue)).toList();
 		List<ImportGithubIssue> importData = importIssues.stream()
 				.map(jiraIssue -> {
+					logger.debug("Prepare import data for jiraIssue: {}", jiraIssue.getKey());
 					issueProcessor.beforeConversion(jiraIssue);
 					ImportGithubIssue issueToImport = new ImportGithubIssue();
 					issueToImport.setIssue(initGithubIssue(jiraIssue, milestones, restrictedIssueKeys));
