@@ -15,7 +15,9 @@
  */
 package io.pivotal.migration;
 
+import io.pivotal.jira.JiraIssue;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -27,6 +29,27 @@ import org.springframework.context.annotation.Import;
 @Import(CommonApacheMavenMigrationConfig.class)
 @ConditionalOnProperty(name = "jira.projectId", havingValue = "MNG")
 public class MngMigrationConfig {
+
+    @Bean
+    public IssueProcessor issueProcessor() {
+        return new CompositeIssueProcessor(new CommonApacheMavenMigrationConfig.FixDependencyIssueProcessor(), new CommonApacheMavenMigrationConfig.SkipBotCommentIssueProcessor(), new Mng925IssueProcessor());
+    }
+
+
+
+    /**
+     * The description of MNG-925 is large enough to cause import failure.
+     */
+    private static class Mng925IssueProcessor implements IssueProcessor {
+
+        @Override
+        public void beforeConversion(JiraIssue issue) {
+            if (issue.getKey().equals("MNG-925")) {
+                JiraIssue.Fields fields = issue.getFields();
+                fields.setDescription(fields.getDescription().replace(">", ""));
+            }
+        }
+    }
 
 
 
