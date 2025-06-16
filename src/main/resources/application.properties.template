@@ -60,7 +60,8 @@ github.delete-create-repository-slug=false
 #jira.migrate-jql=project\=${jira.projectId} AND created >=2020-01-01
 
 # JQL Queries for MNG migration. It has to be done in 9 migration runs
-#jira.migrate-jql=project\=${jira.projectId} AND created < 2006-01-01 # result 1236
+#jira.migrate-jql=project\=${jira.projectId} AND created < 2005-08-01 # result 604
+#jira.migrate-jql=project\=${jira.projectId} AND created >=2005-08-01 AND created < 2006-01-01 # result 632
 #jira.migrate-jql=project\=${jira.projectId} AND created >=2006-01-01 AND created < 2007-01-01 # result 662
 #jira.migrate-jql=project\=${jira.projectId} AND created >=2007-01-01 AND created < 2009-01-01 # result 1038
 #jira.migrate-jql=project\=${jira.projectId} AND created >=2009-01-01 AND created < 2011-01-01 # result 893
