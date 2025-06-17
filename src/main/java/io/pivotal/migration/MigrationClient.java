@@ -128,7 +128,6 @@ public class  MigrationClient {
 	private int importBatchSize = 100;
 
 	private final JiraIssueFilter jiraIssueFilter;
-	private GithubConfig githubConfig;
 
 
 	@Autowired
@@ -400,7 +399,7 @@ public class  MigrationClient {
 
 	private boolean resolvedCommentAlreadyExists(int pullRequestNumber) {
 		String url = GITHUB_URL + "/repos/" + this.config.getRepositorySlug() + "/issues/" + pullRequestNumber + "/comments";
-		RequestEntity<Void> request = RequestEntity.method(HttpMethod.GET, URI.create(url)).header("Authorization", "token " + getGithubConfig().getAccessToken()).build();
+		RequestEntity<Void> request = RequestEntity.method(HttpMethod.GET, URI.create(url)).header("Authorization", "token " + this.config.getAccessToken()).build();
 		ResponseEntity<GithubComment[]> response = getRest().exchange(request, GithubComment[].class);
 		return Arrays.stream(response.getBody()).anyMatch(comment -> comment.getBody().contains("Resolve #"));
 	}
