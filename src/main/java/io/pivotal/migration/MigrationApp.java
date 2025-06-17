@@ -129,8 +129,12 @@ public class MigrationApp implements CommandLineRunner {
 			github.createRepository();
 
 			if (issueMappings.isEmpty() && issuesPendingMapping.isEmpty()) {
+				logger.info("Searching for JIRA-Project");
 				JiraProject project = jira.findProject(jiraConfig.getProjectId());
+
+				logger.info("Creating GitHub Milestones (if not exists)");
 				github.createMilestonesIfNotExists(project.getVersions());
+				logger.info("Creating GitHub Labels (if not exists)");
 				github.createLabelsIfNotExist();
 			}
 			else {
@@ -139,7 +143,11 @@ public class MigrationApp implements CommandLineRunner {
 			}
 
 			String migrateJql = jiraConfig.getMigrateJql();
+
+			logger.info(String.format("Starting to find Issues, Votes and Commits from JIRA, using the following JQL-String [%s]", migrateJql));
+
 			List<JiraIssue> issues = jira.findIssuesVotesAndCommits(migrateJql, context::filterRemaingIssuesToImport);
+
 
 			List<String> restrictedIssueKeys = issues.stream()
 					.filter(issue -> !issue.getFields().isPublic())
@@ -148,6 +156,9 @@ public class MigrationApp implements CommandLineRunner {
 			List<JiraIssue> publicIssues = issues.stream()
 					.filter(issue -> issue.getFields().isPublic())
 					.collect(Collectors.toList());
+
+			logger.info(String.format("Found [%d] restricted Issues and [%d] public issues", restrictedIssueKeys.size(), publicIssues.size()));
+
 
 			github.createIssues(publicIssues, restrictedIssueKeys, context);
 			List<JiraIssue> pendingJiraIssues = jira.findIssues(migrateJql).stream().filter(context.filterPendingIssuesForPRLinking()).toList();
