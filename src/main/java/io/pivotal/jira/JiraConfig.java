@@ -54,7 +54,22 @@ public class JiraConfig {
 	 */
 	String password;
 
+	/**
+	 * Component in shared projects (Optional).
+	 */
+	String component;
+
 	public String getMigrateJql() {
-		return migrateJql == null ? "project = " + getProjectId() + " ORDER BY key ASC" : migrateJql;
+		if(null != migrateJql) {
+			return migrateJql;
+		}
+
+		String jqlString = "project = " + getProjectId();
+
+		if (null != component){
+			jqlString = jqlString + " AND component = '" + component + "'";
+		}
+
+		return jqlString + " ORDER BY key ASC";
 	}
 }
