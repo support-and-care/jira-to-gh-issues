@@ -54,6 +54,7 @@ public class BaseApp {
 		config.setMigrateJql(props.getProperty("jira.migrate-jql"));
 		config.setUser(props.getProperty("jira.user"));
 		config.setPassword(props.getProperty("jira.password"));
+		config.setComponent(props.getProperty("jira.component"));
 		return config;
 	}
 
