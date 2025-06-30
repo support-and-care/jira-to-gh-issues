@@ -15,11 +15,16 @@
  */
 package io.pivotal.migration;
 
+import io.pivotal.github.ImportGithubIssue;
 import io.pivotal.jira.JiraIssue;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.util.StringUtils;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -32,7 +37,7 @@ public class MngMigrationConfig {
 
     @Bean
     public IssueProcessor issueProcessor() {
-        return new CompositeIssueProcessor(new CommonApacheMavenMigrationConfig.FixDependencyIssueProcessor(), new CommonApacheMavenMigrationConfig.SkipBotCommentIssueProcessor(), new Mng925IssueProcessor());
+        return new CompositeIssueProcessor(new CommonApacheMavenMigrationConfig.FixDependencyIssueProcessor(), new CommonApacheMavenMigrationConfig.SkipBotCommentIssueProcessor(), new Mng925IssueProcessor(), new Mng5592IssueProcessor());
     }
 
 
@@ -49,6 +54,27 @@ public class MngMigrationConfig {
                 fields.setDescription(fields.getDescription().replace(">", ""));
             }
         }
+    }
+
+    /**
+     * The payload of MNG-5592 is too large. Therefore, we have to cut some comments are cut.
+     */
+    private static class Mng5592IssueProcessor implements IssueProcessor {
+
+        @Override
+        public void beforeImport(JiraIssue jiraIssue, ImportGithubIssue importIssue) {
+            if (jiraIssue.getKey().equals("MNG-5592")) {
+                importIssue.getComments().forEach(comment -> {
+                    if (comment.getBody().contains("org.eclipse.aether.graph.DefaultDependencyNode@")) {
+                        String commentBody = comment.getBody();
+                        List<String> list = Arrays.stream(StringUtils.delimitedListToStringArray(commentBody, "\n")).filter(line -> !line.contains("org.eclipse.aether.graph.DefaultDependencyNode@")).toList();
+                        comment.setBody("[Snipped see original comment in jira]\n\n" + StringUtils.collectionToDelimitedString(list, "\n"));
+                    }
+                });
+            }
+        }
+
+
     }
 
 
