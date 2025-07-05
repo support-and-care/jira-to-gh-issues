@@ -223,11 +223,25 @@ public class  MigrationClient {
 	}
 
 	private MilestoneFilter findExistingMilestones() {
-		BodyBuilder requestBuilder = getRepositoryRequestBuilder(HttpMethod.GET, "/milestones?state=all&per_page=100");
-		List<String> existingMilestones =this.getRest().exchange(requestBuilder.build(), LIST_OF_MAPS_TYPE)
+
+		// Maven Core has 120 milestones: 22 open, 88 closed.
+		// So we need pagination or quick and dirty hack split it into two requests
+
+		BodyBuilder requestBuilderOpen = getRepositoryRequestBuilder(HttpMethod.GET, "/milestones?state=open&per_page=100");
+		List<String> existingMilestones =this.getRest().exchange(requestBuilderOpen.build(), LIST_OF_MAPS_TYPE)
 				.getBody().stream()
 							.map(milestone -> (String) milestone.get("title"))
 							.toList();
+
+		BodyBuilder requestBuilderClosed = getRepositoryRequestBuilder(HttpMethod.GET, "/milestones?state=closed&per_page=100");
+		List<String> closedExistingMilestones = this.getRest().exchange(requestBuilderClosed.build(), LIST_OF_MAPS_TYPE)
+			.getBody().stream()
+			.map(milestone -> (String) milestone.get("title"))
+			.toList();
+
+		existingMilestones.addAll(closedExistingMilestones);
+
+		logger.info("{} existing milestones: {}", existingMilestones.size(), existingMilestones);
 		return jiraVersion -> !existingMilestones.contains(jiraVersion.getName());
 	}
 
