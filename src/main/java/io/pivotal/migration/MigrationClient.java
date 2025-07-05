@@ -243,7 +243,7 @@ public class  MigrationClient {
 	}
 
 	private List<String> findExistingLabels() {
-		RequestEntity<Void> requestEntity = getRepositoryRequestBuilder(HttpMethod.GET, "/labels").build();
+		RequestEntity<Void> requestEntity = getRepositoryRequestBuilder(HttpMethod.GET, "/labels?per_page=100").build();
 		List<Map<String, Object>> exitingsLabels = getRest().exchange(requestEntity, LIST_OF_MAPS_TYPE).getBody();
 		List<String> existingLabelNames = exitingsLabels.stream().map(labelObject -> (String) labelObject.get("name")).toList();
 		logger.info("Existing labels: {}", existingLabelNames);
