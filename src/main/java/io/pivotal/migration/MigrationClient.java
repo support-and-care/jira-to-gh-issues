@@ -228,10 +228,12 @@ public class  MigrationClient {
 		// So we need pagination or quick and dirty hack split it into two requests
 
 		BodyBuilder requestBuilderOpen = getRepositoryRequestBuilder(HttpMethod.GET, "/milestones?state=open&per_page=100");
-		List<String> existingMilestones =this.getRest().exchange(requestBuilderOpen.build(), LIST_OF_MAPS_TYPE)
+		List<String> openExistingMilestones = this.getRest().exchange(requestBuilderOpen.build(), LIST_OF_MAPS_TYPE)
 				.getBody().stream()
 							.map(milestone -> (String) milestone.get("title"))
 							.toList();
+
+		logger.info("{} existing OPEN milestones: {}", openExistingMilestones.size(), openExistingMilestones);
 
 		BodyBuilder requestBuilderClosed = getRepositoryRequestBuilder(HttpMethod.GET, "/milestones?state=closed&per_page=100");
 		List<String> closedExistingMilestones = this.getRest().exchange(requestBuilderClosed.build(), LIST_OF_MAPS_TYPE)
@@ -239,10 +241,15 @@ public class  MigrationClient {
 			.map(milestone -> (String) milestone.get("title"))
 			.toList();
 
-		existingMilestones.addAll(closedExistingMilestones);
+		logger.info("{} existing CLOSED milestones: {}", closedExistingMilestones.size(), closedExistingMilestones);
 
-		logger.info("{} existing milestones: {}", existingMilestones.size(), existingMilestones);
-		return jiraVersion -> !existingMilestones.contains(jiraVersion.getName());
+		List<String> allMilestones = new ArrayList<String>(openExistingMilestones.size() + closedExistingMilestones.size());
+
+		allMilestones.addAll(openExistingMilestones);
+		allMilestones.addAll(closedExistingMilestones);
+
+		logger.info("{} existing milestones in total: {}", allMilestones.size(), allMilestones);
+		return jiraVersion -> !allMilestones.contains(jiraVersion.getName());
 	}
 
 	public void createLabelsIfNotExist() {
