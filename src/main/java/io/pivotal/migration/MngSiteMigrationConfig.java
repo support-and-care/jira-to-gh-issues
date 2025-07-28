@@ -31,7 +31,7 @@ import java.util.List;
  */
 @Configuration
 @ConditionalOnProperty(name = "jira.projectId", havingValue = "MNGSITE")
-public class MngSiteMigrationConfig {
+public class MngSiteMigrationConfig extends CommonApacheMavenMigrationConfig {
 
 	private static final List<String> skipVersions =
 			Arrays.asList("Contributions Welcome", "Pending Closure", "Waiting for Triage");
@@ -62,23 +62,6 @@ public class MngSiteMigrationConfig {
 	public IssueProcessor issueProcessor() {
 		return new CompositeIssueProcessor(new FixDependencyIssueProcessor(), new SkipBotCommentIssueProcessor());
 	}
-
-	@Bean
-	public JiraIssueFilter jiraIssueFilter() {
-		return new CompositeJiraIssueFilter(new OpenJiraIssueFilter());
-	}
-
-	private static class OpenJiraIssueFilter implements JiraIssueFilter {
-
-		public OpenJiraIssueFilter() {
-        }
-
-		@Override
-		public boolean test(JiraIssue jiraIssue) {
-			return jiraIssue.getFields().getStatus().getName().equals("Open");
-		}
-	}
-
 
 	private static class FixDependencyIssueProcessor implements IssueProcessor {
 
