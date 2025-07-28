@@ -1,5 +1,7 @@
 # Migration tool for migrating issues from Apache Maven Jira to GitHub
 
+**CAUTION:** The migration has finished, therefore this repository is archived.
+
 This tool is based on the migration tool, that is written by the Spring Team, originally.
 
 Some Key Features:
